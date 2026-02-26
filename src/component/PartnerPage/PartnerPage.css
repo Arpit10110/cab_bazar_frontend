@@ -1,0 +1,98 @@
+.partner-wrapper {
+  position: relative;
+  min-height: 100vh;
+  background: #f3f3f3;
+  display: flex;
+}
+
+/* LEFT YELLOW LINE */
+.left-yellow-line {
+  width: 20px;
+  background: #f4b400;
+}
+
+/* RIGHT TOP YELLOW BLOCK */
+.right-top-yellow {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 25px;
+  height: 25px;
+  background: #f4b400;
+}
+
+/* MAIN CONTENT */
+.partner-content {
+  flex: 1;
+  padding: 70px 100px;
+}
+
+.partner-content h1 {
+  font-size: 48px;
+  font-weight: 400;
+  margin-bottom: 60px;
+}
+
+/* GRID LAYOUT */
+.partner-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 70px 120px;
+}
+
+/* CARD */
+.partner-card h3 {
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+.partner-card p {
+  color: #444;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  max-width: 450px;
+}
+
+.partner-card button {
+  background: #f4b400;
+  border: none;
+  padding: 12px 24px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* DOUBLE BUTTON */
+.btn-group {
+  display: flex;
+  gap: 10px;
+}
+
+.outline-btn {
+  background: #f4b400;
+}
+
+/* RESPONSIVE */
+@media (max-width: 992px) {
+  .partner-wrapper {
+    flex-direction: column;
+  }
+
+  .left-yellow-line {
+    display: none;
+  }
+
+  .partner-content {
+    padding: 40px 30px;
+  }
+
+  .partner-grid {
+    grid-template-columns: 1fr;
+    gap: 50px;
+  }
+}
+
+@media(max-width:768px){
+  .partner-content h1{
+    text-align: center;
+  }
+}

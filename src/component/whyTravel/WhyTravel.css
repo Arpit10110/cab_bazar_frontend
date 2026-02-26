@@ -1,0 +1,36 @@
+@media(max-width:768px){
+    .feature-block{
+        text-align: start;
+    }
+    .main-heading{
+      font-size: 30px !important;
+    }
+}
+
+.main-heading{
+  font-size: 40px;
+  padding-left: 20px;
+}
+
+@media(min-width:968px){
+.book-btn{
+    margin: 20px;
+}
+}
+.why-section {
+  padding: 80px 0;
+  background: #f3f3f3;
+  position: relative;   /* IMPORTANT */
+  margin-bottom: 0px;
+}
+
+/* ===== YELLOW RIGHT LINE ===== */
+.yellow-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;      /* better than height:100% */
+  right: 0;
+  width: 20px;
+  background: #f4b400;
+  pointer-events: none;
+}

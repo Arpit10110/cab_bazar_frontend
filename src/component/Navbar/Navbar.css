@@ -1,0 +1,18 @@
+.custom-navbar {
+  background: transparent;
+  padding: 8px 0;
+  transition: 0.3s ease;
+  background-color: black;
+  z-index: 5;
+  position: relative;
+}
+
+.logo-img {
+  height: 40px;
+  object-fit: contain;
+}
+
+/* Optional: Scroll pe background black ho jaye */
+.custom-navbar.scrolled {
+  background: black;
+}

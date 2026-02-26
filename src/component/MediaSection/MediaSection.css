@@ -1,0 +1,169 @@
+/* ================= GLOBAL ================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* ================= SECTION ================= */
+
+.media-section {
+  position: relative;
+  background: #efefef;
+  padding: 80px 0 40px 0;   /* extra bottom for dots */
+}
+
+.media-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: auto;
+  padding: 0 15px;
+}
+
+.media-heading {
+  font-size: 42px;
+  font-weight: 400;
+  margin-bottom: 50px;
+}
+
+/* ================= CARD ================= */
+
+.media-card {
+  background: #f7f7f7;
+  padding: 45px 35px;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  min-height: 480px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: 0.3s ease;
+}
+
+.media-card:hover {
+  transform: translateY(-5px);
+}
+
+.media-logo-box {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.media-logo-box img {
+  max-width: 180px;
+  width: 100%;
+  height: auto;
+}
+
+/* ================= TITLE ================= */
+
+.media-title {
+  color: #1a40ff;
+  font-weight: 600;
+  font-size: 16px;
+  text-decoration: none;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  display: block;
+}
+
+.media-title:hover {
+  text-decoration: underline;
+}
+
+/* ================= DESC ================= */
+
+.media-desc {
+  font-size: 15px;
+  line-height: 1.8;
+  color: #444;
+  margin-bottom: 30px;
+}
+
+/* ================= FOOTER ================= */
+
+.media-footer {
+  text-align: center;
+}
+
+.media-footer strong {
+  display: block;
+  font-size: 16px;
+}
+
+.media-footer span {
+  font-size: 14px;
+  color: #666;
+}
+
+/* ================= YELLOW BAR ================= */
+
+.media-right-bar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 20px;
+  height: 100%;
+  background: #f4b400;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ================= SLICK SPACING FIX ================= */
+
+.slick-slide {
+  padding: 0 10px;
+}
+
+.slick-list {
+  margin: 0 -10px;
+}
+
+.slick-slider {
+  margin-bottom: 40px;
+}
+
+/* ================= DOTS ================= */
+
+.slick-dots {
+  bottom: -60px;
+}
+
+.slick-dots li button:before {
+  font-size: 12px;
+  color: #999;
+  opacity: 1;
+}
+
+.slick-dots li.slick-active button:before {
+  color: #000;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 1024px) {
+  .media-card {
+    min-height: 440px;
+  }
+}
+
+@media (max-width: 768px) {
+
+  .media-heading {
+    font-size: 26px;
+  }
+
+  .media-card {
+    min-height: auto;
+    padding: 30px 20px;
+  }
+
+  .media-right-bar {
+    display: none;
+  }
+}

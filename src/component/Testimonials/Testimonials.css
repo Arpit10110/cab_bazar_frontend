@@ -1,0 +1,148 @@
+/* MAIN LAYOUT */
+.testimonial-section {
+  display: flex;
+  background: #f4f4f4;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* RIGHT YELLOW STRIP */
+/* .yellow-strip-right {
+  width: 18px;
+  background: #f4b400;
+} */
+
+/* CONTENT */
+.testimonial-content {
+  flex: 1;
+  padding: 60px 80px;
+}
+
+.testimonial-content h1 {
+  font-size: 42px;
+  font-weight: 400;
+  margin-bottom: 50px;
+}
+
+/* TOP CUSTOMER ROW */
+.customer-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 60px;
+}
+
+.customer-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: 0.3s;
+}
+
+.customer-item img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.customer-name {
+  font-weight: 600;
+}
+
+.customer-location {
+  font-size: 14px;
+  color: #777;
+  border-bottom: 1px solid #aaa;
+}
+
+.customer-item.active {
+  opacity: 1;
+}
+
+.customer-item.active .customer-location {
+  border-bottom: 2px solid black;
+  color: black;
+}
+
+/* REVIEW SECTION */
+.review-section {
+  display: flex;
+  align-items: center;
+  gap: 50px;
+}
+
+.large-image {
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.review-text {
+  max-width: 600px;
+  line-height: 1.7;
+}
+
+.review-text h4 {
+  margin-top: 20px;
+  font-weight: 600;
+}
+
+/* RESPONSIVE */
+@media (max-width: 992px) {
+  .testimonial-section {
+    flex-direction: column;
+  }
+
+  .yellow-strip-right {
+    display: none;
+  }
+
+  .customer-row {
+    flex-direction: column;
+    gap: 25px;
+  }
+
+  .review-section {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .large-image {
+    width: 200px;
+    height: 200px;
+  }
+}
+@media(max-width:768px){
+  .testimonial-content h1{
+    font-size: 26px;
+    text-align: center;
+ 
+  }
+  .review-text{
+    width: 300px;
+    font-size: 15px
+  }
+}
+.testimonial-section {
+  display: flex;
+  background: #f4f4f4;
+  min-height: 100vh;
+  position: relative;   /* ✔ already correct */
+}
+/* RIGHT YELLOW LINE */
+.yellow-line {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 20px;
+  height: 100%;
+  background: #f4b400;
+}
+@media (max-width: 768px) {
+  .yellow-line {
+    display: none;
+  }
+}

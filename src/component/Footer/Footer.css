@@ -1,0 +1,153 @@
+.footer {
+  background: #111;
+  color: #fff;
+  padding: 60px 0;
+  font-family: Arial, sans-serif;
+}
+
+.container {
+  width: 90%;
+  margin: auto;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid #333;
+  margin: 25px 0;
+}
+
+.popular-cities .title {
+  font-weight: bold;
+}
+
+.popular-cities p {
+  margin: 10px 0;
+  font-size: 14px;
+  color: #ccc;
+}
+
+.explore,
+.explore-route {
+  margin-top: 10px;
+  cursor: pointer;
+  color: #aaa;
+  font-size: 14px;
+}
+
+.services {
+  text-align: center;
+  font-size: 14px;
+  color: #ccc;
+}
+
+.routes {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.route-col {
+  width: 23%;
+}
+
+.route-col h4 {
+  font-size: 15px;
+  margin-bottom: 12px;
+}
+
+.route-col a {
+  display: block;
+  color: #ccc;
+  font-size: 14px;
+  margin-bottom: 8px;
+  text-decoration: none;
+}
+
+.route-col a:hover {
+  color: #fff;
+}
+
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.app-buttons img {
+  height: 45px;
+  margin-right: 15px;
+}
+
+.social-icons1 a {
+  margin-left: 15px;
+  color: #fff;
+  font-size: 16px;
+  transition: 0.3s;
+}
+
+.social-icons a:hover {
+  color: #f4b400;
+}
+
+.footer-links {
+  font-size: 14px;
+  color: #ccc;
+  line-height: 1.7;
+}
+
+.copyright {
+  display: flex;
+  gap: 20px;
+  font-size: 14px;
+  align-items: center;
+}
+
+/* Responsive */
+
+@media (max-width: 992px) {
+  .route-col {
+    width: 48%;
+    margin-bottom: 25px;
+  }
+  
+}
+
+@media (max-width: 600px) {
+  .routes {
+    flex-direction: column;
+  }
+  .container{
+    align-items: center;
+    text-align: center;
+    justify-items: center;
+  }
+  .social-icons1{
+    justify-items: center;
+    justify-content: center;
+    margin-left: 25px;
+  }
+
+  .route-col {
+    width: 100%;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .copyright {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+.footer hr {
+  border: none !important;
+  height: 2px;
+  background-color: #ffffff !important;  /* Pure white */
+  margin: 35px 0;
+  width: 100%;
+  opacity: 1 !important;   /* ensure no fade */
+}
