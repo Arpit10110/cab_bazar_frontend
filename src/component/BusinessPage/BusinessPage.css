@@ -55,6 +55,32 @@
   font-size: 14px;
 }
 
+
+@media (max-width: 450px) {
+.hero-row {
+    position: relative;
+    z-index: 2;
+    min-height: 66vh;
+    align-items: center;
+}
+    .mobile-image {
+        display: block;
+        height: 151px;
+    }
+    .booking-card {
+        background: none !important;
+        width: 370px !important;
+        margin-top: 40px;
+    }
+    #root {
+    max-width: 1280px;
+    margin: 0;
+    padding: 0rem;
+    text-align: center;
+}
+}
+  
+
 .business-form button {
   margin-top: 25px;
   padding: 12px;
