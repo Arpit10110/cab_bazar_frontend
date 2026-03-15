@@ -8,7 +8,7 @@ import WhyTravel from './whyTravel/WhyTravel'
  import BusinessPage from './BusinessPage/BusinessPage'
  import Testimonials from './Testimonials/Testimonials'
  import PartnerPage from './PartnerPage/PartnerPage'
-import MediaSection from './MediaSection/MediaSection'
+// import MediaSection from './MediaSection/MediaSection'
 import ContactSection from './ContactSection/ContactSection'
 import Footer from './Footer/Footer'
 
@@ -27,7 +27,7 @@ function HeroSection() {
    <BusinessPage/>
    <Testimonials/>
    <PartnerPage/>
-   <MediaSection/>
+   {/* <MediaSection/> */}
    <ContactSection/>
    <Footer/>
    

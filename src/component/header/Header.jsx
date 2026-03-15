@@ -270,7 +270,7 @@ const HeroWithPromo = () => {
           <div className="promo-item">
   <h6>Get ₹200 cashback on mobile app download</h6>
 
-  <div className="store-buttons">
+  <div className="store-buttons d-none">
     {/* Play Store - Always Visible */}
     <a 
       href="https://play.google.com/store/apps" 
@@ -324,11 +324,11 @@ const HeroWithPromo = () => {
             <div className="carousel-card">
               <div className="promo-item">
                 <h6>Get ₹200 cashback on mobile app download</h6>
-                 <img
+                 {/* <img
         src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
         alt="Google Play Store"
         className="play-store"
-      />
+      /> */}
               </div>
             </div>
             <div className="carousel-card d-md-none">

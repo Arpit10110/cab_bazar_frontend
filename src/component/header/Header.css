@@ -224,6 +224,17 @@
     background: none;
     min-height: auto;
   }
+  .slick-initialized .slick-slide{
+    /* margin-top: 50px !important; */
+    margin-bottom: 50px !important;
+  }
+  .hero-row {
+ position: relative;
+        z-index: 2;
+        min-height: 74vh;
+        align-items: center;
+        margin-top: 40px;
+}
 
   .slick-slide img{
   margin-left: 55px !important;
@@ -252,8 +263,8 @@
   }
 
   .booking-card{background: none !important;
-    width: 370px !important;
-    margin-top: 40px;
+    width: 470px !important;
+    /* margin-top: -30px; */
   }
   .mobile-view {
     display: block;

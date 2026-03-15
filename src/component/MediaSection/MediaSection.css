@@ -7,7 +7,7 @@
 html, body {
   margin: 0;
   padding: 0;
-  overflow-x: hidden;
+  overflow-x: hidden; /* Keep this to prevent overall horizontal scroll */
 }
 
 /* ================= SECTION ================= */
@@ -22,13 +22,14 @@ html, body {
   width: 100%;
   max-width: 1200px;
   margin: auto;
-  padding: 0 15px;
+  padding: 0 15px; /* Use padding here for consistent spacing */
 }
 
 .media-heading {
   font-size: 42px;
   font-weight: 400;
   margin-bottom: 50px;
+  text-align: center; /* Center the heading for better mobile aesthetics */
 }
 
 /* ================= CARD ================= */
@@ -38,11 +39,15 @@ html, body {
   padding: 45px 35px;
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  min-height: 480px;
+
+  /* Remove min-height for mobile to allow content to dictate height */
+  /* min-height: 480px; */
+
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   transition: 0.3s ease;
+  height: 100%; /* Ensure cards fill available height in the slide */
 }
 
 .media-card:hover {
@@ -89,6 +94,7 @@ html, body {
 
 .media-footer {
   text-align: center;
+  margin-top: auto; /* Pushes the footer to the bottom of the flex container */
 }
 
 .media-footer strong {
@@ -116,13 +122,23 @@ html, body {
 
 /* ================= SLICK SPACING FIX ================= */
 
+/* Crucial for proper mobile responsiveness with slick-carousel */
 .slick-slide {
-  padding: 0 10px;
+  padding: 0 10px; /* Add padding here for spacing *between* cards */
+  display: flex !important; /* Ensure slick-slide is a flex container */
+  height: auto; /* Allow slick slide to adjust height based on content */
 }
 
 .slick-list {
-  margin: 0 -10px;
+  margin: 0 -10px; /* Counteract the padding on slick-slide for overall layout */
+  overflow: hidden; /* Hide horizontal overflow inside the list */
 }
+
+.slick-track {
+  display: flex !important; /* Ensure slick-track is a flex container */
+  align-items: stretch; /* Make all slides equal height based on tallest content */
+}
+
 
 .slick-slider {
   margin-bottom: 40px;
@@ -148,22 +164,80 @@ html, body {
 
 @media (max-width: 1024px) {
   .media-card {
-    min-height: 440px;
+    /* min-height property can be removed or adjusted as needed */
+    /* If you want consistent height on tablets, keep it or use a specific height */
+    /* min-height: 440px; */
+  }
+
+  .media-heading {
+    font-size: 36px; /* Slightly adjust heading for tablets */
   }
 }
 
 @media (max-width: 768px) {
 
+  .media-section {
+    padding: 40px 0 30px 0; /* Adjust section padding for mobile */
+  }
+
+  .media-container {
+    padding: 0 10px; /* Reduce container padding on very small screens */
+  }
+
   .media-heading {
     font-size: 26px;
+    margin-bottom: 30px; /* Adjust heading margin */
   }
 
   .media-card {
-    min-height: auto;
-    padding: 30px 20px;
+    min-height: auto; /* This is good for mobile, lets content define height */
+    padding: 30px 20px; /* Adjust card padding for smaller screens */
+  }
+
+  .media-logo-box img {
+    max-width: 150px; /* Slightly smaller logo for mobile */
+  }
+
+  .media-title {
+    font-size: 15px; /* Adjust title font size */
+  }
+
+  .media-desc {
+    font-size: 14px; /* Adjust description font size */
+  }
+
+  .media-footer strong {
+    font-size: 15px; /* Adjust footer strong font size */
+  }
+
+  .media-footer span {
+    font-size: 13px; /* Adjust footer span font size */
   }
 
   .media-right-bar {
     display: none;
+  }
+
+  .slick-dots {
+    bottom: -40px; /* Adjust dot position for mobile */
+  }
+}
+
+@media (max-width: 480px) { /* Even smaller screens */
+  .media-section {
+    padding: 30px 0 20px 0;
+  }
+  .media-heading {
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+  .media-card {
+    padding: 20px 15px;
+  }
+  .media-title {
+    font-size: 14px;
+  }
+  .media-desc {
+    font-size: 13px;
   }
 }
