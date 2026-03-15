@@ -229,12 +229,12 @@
     margin-bottom: 50px !important;
   }
   .hero-row {
- position: relative;
-        z-index: 2;
-        min-height: 74vh;
-        align-items: center;
-        margin-top: 40px;
-}
+    position: relative;
+    z-index: 2;
+    min-height: 74vh !important;
+    align-items: center;
+    margin-top: 40px !important;
+  }
 
   .slick-slide img{
   margin-left: 55px !important;
