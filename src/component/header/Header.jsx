@@ -109,8 +109,8 @@ const HeroWithPromo = () => {
     <>
       {/* HERO SECTION */}
       <div className="w-full min-h-screen bg-[url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e')] bg-no-repeat bg-center bg-cover relative flex items-center max-md:bg-none max-md:min-h-auto">
-          <Row className="relative z-[2] min-h-screen items-center max-md:min-h-[74vh] max-md:mt-10">
-            <Col lg={5} md={6} xs={12} className="flex justify-start px-5 !-mt-20 max-md:!-mt-0">
+          <Row className="relative w-full z-[2] min-h-screen max-[450px]:!m-auto items-center max-md:min-h-[74vh] max-md:mt-10">
+          <Col lg={5} md={6} xs={12} className="flex max-[450px]:!px-0  justify-start px-5 !-mt-20 max-md:!-mt-0">
               <div className="bg-[#f3f3f3] rounded-[25px] p-[25px] w-full max-w-[420px] min-h-[520px] flex flex-col justify-between max-md:!bg-transparent max-md:!w-[470px]">
                 <div className="bg-[#f5b400] p-3 text-center rounded-[15px] mb-5 font-semibold">All India Cab Service</div>
 
