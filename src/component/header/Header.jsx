@@ -4,7 +4,6 @@ import { FaPhoneAlt, FaLocationArrow } from "react-icons/fa";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import "./Header.css";
 import { useNavigate } from "react-router-dom";
 
 const HeroWithPromo = () => {
@@ -109,19 +108,19 @@ const HeroWithPromo = () => {
   return (
     <>
       {/* HERO SECTION */}
-      <div className="hero-wrapper">
+      <div className="w-full min-h-screen bg-[url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e')] bg-no-repeat bg-center bg-cover relative flex items-center max-md:bg-none max-md:min-h-auto">
         <Container>
-          <Row className="hero-row">
-            <Col lg={5} md={6} xs={12} className="form-col">
-              <div className="booking-card">
-                <div className="top-title">All India Cab Service</div>
+          <Row className="relative z-[2] min-h-screen items-center max-md:min-h-[74vh] max-md:mt-10">
+            <Col lg={5} md={6} xs={12} className="flex justify-start px-5 !-mt-20 max-md:!-mt-0">
+              <div className="bg-[#f3f3f3] rounded-[25px] p-[25px] w-full max-w-[420px] min-h-[520px] flex flex-col justify-between max-md:!bg-transparent max-md:!w-[470px]">
+                <div className="bg-[#f5b400] p-3 text-center rounded-[15px] mb-5 font-semibold">All India Cab Service</div>
 
-                <div className="trip-type">
+                <div className="flex gap-2.5 mb-[15px]">
                   <Button
                     className={
                       tripType === "outstation"
-                        ? "active-btn"
-                        : "inactive-btn"
+                        ? "!bg-[#f5b400] !rounded-[25px] !border-none font-semibold flex-1"
+                        : "!bg-[#ddd] !rounded-[25px] !border-none flex-1 text-black"
                     }
                     onClick={() => setTripType("outstation")}
                   >
@@ -130,7 +129,9 @@ const HeroWithPromo = () => {
 
                   <Button
                     className={
-                      tripType === "local" ? "active-btn" : "inactive-btn"
+                      tripType === "local" 
+                        ? "!bg-[#f5b400] !rounded-[25px] !border-none font-semibold flex-1" 
+                        : "!bg-[#ddd] !rounded-[25px] !border-none flex-1 text-black"
                     }
                     onClick={() => setTripType("local")}
                   >
@@ -139,24 +140,24 @@ const HeroWithPromo = () => {
                 </div>
 
                 {tripType === "outstation" && (
-                  <div className="trip-option">
-                    <span onClick={() => setTripMode("round")}>
+                  <div className="flex justify-between bg-[#e9e9e9] py-2.5 px-[15px] rounded-[15px] mb-[15px] cursor-pointer">
+                    <span onClick={() => setTripMode("round")} className="flex items-center">
                       <span
                         className={
                           tripMode === "round"
-                            ? "radio-active"
-                            : "radio-inactive"
+                            ? "h-[15px] w-[15px] bg-[#f5b400] rounded-full inline-block mr-1.5"
+                            : "h-[15px] w-[15px] border-2 border-black rounded-full inline-block mr-1.5"
                         }
                       ></span>
                       Round Trip
                     </span>
 
-                    <span onClick={() => setTripMode("oneway")}>
+                    <span onClick={() => setTripMode("oneway")} className="flex items-center">
                       <span
                         className={
                           tripMode === "oneway"
-                            ? "radio-active"
-                            : "radio-inactive"
+                            ? "h-[15px] w-[15px] bg-[#f5b400] rounded-full inline-block mr-1.5"
+                            : "h-[15px] w-[15px] border-2 border-black rounded-full inline-block mr-1.5"
                         }
                       ></span>
                       One Way Trip
@@ -168,7 +169,7 @@ const HeroWithPromo = () => {
                   {cities.map((city, index) => (
                     <Form.Group
                       key={index}
-                      className="mb-3 position-relative"
+                      className="mb-3 relative"
                     >
                       <Form.Control
                         type="text"
@@ -182,15 +183,16 @@ const HeroWithPromo = () => {
                           handleCityChange(e.target.value, index)
                         }
                         autoComplete="off"
+                        className="!rounded-xl !py-3 !pr-10 !pl-[15px] !border-none !bg-[#e8e8e8c9]"
                       />
 
-                      <FaLocationArrow className="input-icon" />
+                      <FaLocationArrow className="absolute right-[15px] top-[12px] text-gray-500" />
 
                       {activeIndex === index &&
                         (suggestions.length > 0 || loading) && (
-                          <div className="suggestion-box">
+                          <div className="bg-white absolute w-full top-[45px] rounded-lg shadow-[0_5px_15px_rgba(0,0,0,0.1)] z-[99]">
                             {loading && (
-                              <div className="suggestion-item">
+                              <div className="px-3 py-2 cursor-pointer">
                                 Loading...
                               </div>
                             )}
@@ -199,7 +201,7 @@ const HeroWithPromo = () => {
                               suggestions.map((item) => (
                                 <div
                                   key={item.place_id}
-                                  className="suggestion-item"
+                                  className="px-3 py-2 cursor-pointer hover:bg-[#f5b400]"
                                   onClick={() => {
                                     const updated = [...cities];
                                     updated[index] = item.description;
@@ -227,14 +229,14 @@ const HeroWithPromo = () => {
                   ))}
 
                   {tripType === "outstation" && (
-                    <div className="add-city" onClick={addCity}>
+                    <div className="bg-[#e9d9b6] p-2.5 rounded-xl mb-[15px] text-center cursor-pointer" onClick={addCity}>
                       + Add More City
                     </div>
                   )}
 
                   {tripType === "local" && (
                     <Form.Group className="mb-3">
-                      <Form.Select>
+                      <Form.Select className="!rounded-xl !py-3 !pr-10 !pl-[15px] !border-none !bg-[#e8e8e8c9]">
                         <option>Select Airport</option>
                         <option>Delhi Airport</option>
                         <option>Mumbai Airport</option>
@@ -243,18 +245,19 @@ const HeroWithPromo = () => {
                     </Form.Group>
                   )}
 
-                  <Form.Group className="mb-3 position-relative">
+                  <Form.Group className="mb-3 relative">
                     <Form.Control
                       type="text"
                       placeholder="Enter mobile number"
                       value={mobile}
                       onChange={(e)=>setMobile(e.target.value)}
                       required
+                      className="!rounded-xl !py-3 !pr-10 !pl-[15px] !border-none !bg-[#e8e8e8c9]"
                     />
-                    <FaPhoneAlt className="input-icon" />
+                    <FaPhoneAlt className="absolute right-[15px] top-[12px] text-gray-500" />
                   </Form.Group>
 
-                  <Button onClick={handleCabData} className="book-btn w-100">
+                  <Button onClick={handleCabData} className="w-full !bg-[#f5b400] !border-none p-2.5 !m-0 font-bold !rounded-[30px] flex justify-center items-center text-black">
                     Book Cab
                   </Button>
                 </Form>
@@ -265,12 +268,12 @@ const HeroWithPromo = () => {
       </div>
 
       {/* PROMO SECTION */}
-      <div className="promo-wrapper">
-        <div className="desktop-view">
-          <div className="promo-item">
-  <h6>Get ₹200 cashback on mobile app download</h6>
+      <div className="w-full flex justify-center -mt-[60px] lg:-mt-[70px] relative z-[5]">
+        <div className="bg-[#efefef] w-[89%] max-w-[1200px] rounded-[80px] py-4 px-[50px] flex items-center mb-5 justify-between max-md:hidden">
+          <div className="flex-1 text-center">
+  <h6 className="font-semibold mb-[15px]">Get ₹200 cashback on mobile app download</h6>
 
-  <div className="store-buttons d-none">
+  <div className="d-none flex gap-2.5 mt-2.5 justify-center">
     {/* Play Store - Always Visible */}
     <a 
       href="https://play.google.com/store/apps" 
@@ -280,7 +283,7 @@ const HeroWithPromo = () => {
       <img
         src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
         alt="Google Play Store"
-        className="play-store"
+        className="h-[45px] cursor-pointer"
       />
     </a>
 
@@ -289,29 +292,29 @@ const HeroWithPromo = () => {
       href="https://www.apple.com/app-store/" 
       target="_blank" 
       rel="noopener noreferrer"
-      className="app-store-link"
+      className="max-md:hidden"
     >
       <img
         src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"
         alt="App Store"
-        className="app-store"
+        className="h-[45px] cursor-pointer"
       />
     </a>
   </div>
 </div>
 
-          <div className="promo-item border-left">
-            <h4>No return fare</h4>
-            <p>
+          <div className="flex-1 text-center border-l border-[#d4d4d4]">
+            <h4 className="font-bold mb-2">No return fare</h4>
+            <p className="m-0 text-[#555] text-[15px]">
               One-Way cab fare | No hidden charges
               <br />
               Minimal advance
             </p>
           </div>
 
-          <div className="promo-item border-left">
-            <h4>No over-pricing</h4>
-            <p>
+          <div className="flex-1 text-center border-l border-[#d4d4d4]">
+            <h4 className="font-bold mb-2">No over-pricing</h4>
+            <p className="m-0 text-[#555] text-[15px]">
               Cheapest costs | Competitive prices
               <br />
               Pay as you go
@@ -319,32 +322,32 @@ const HeroWithPromo = () => {
           </div>
         </div>
 
-        <div className="mobile-view">
+        <div className="hidden max-md:block w-[95%] max-md:-mb-[105px] [&_.slick-slide]:!mb-[50px] [&_.slick-dots]:!hidden [&_.slick-slide_img]:!ml-[55px] [&_.slick-slide_img]:h-[40px]">
           <Slider {...sliderSettings}>
-            <div className="carousel-card">
-              <div className="promo-item">
-                <h6>Get ₹200 cashback on mobile app download</h6>
+            <div className="bg-[#f1f1f1] rounded-[50px] mt-10 p-[25px] text-center h-[110px] !flex flex-col justify-center shadow-[0_10px_25px_rgba(0,0,0,0.15)]">
+              <div className="flex-1 text-center">
+                <h6 className="font-semibold mb-[15px] max-md:text-[17px]">Get ₹200 cashback on mobile app download</h6>
                  {/* <img
         src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
         alt="Google Play Store"
-        className="play-store"
+        className="h-[45px] cursor-pointer"
       /> */}
               </div>
             </div>
-            <div className="carousel-card d-md-none">
-              <div className="promo-item">
-                <h4>No return fare</h4>
-                 <p>
+            <div className="bg-[#f1f1f1] rounded-[50px] mt-10 p-[25px] text-center h-[110px] !flex flex-col justify-center shadow-[0_10px_25px_rgba(0,0,0,0.15)] d-md-none">
+              <div className="flex-1 text-center">
+                <h4 className="font-bold mb-2">No return fare</h4>
+                 <p className="m-0 text-[#555] text-[15px]">
               One-Way cab | No hidden charges
               <br />
               Minimal advance
             </p>
               </div>
             </div>
-            <div className="carousel-card">
-              <div className="promo-item">
-                <h4>No over-pricing</h4>
-                 <p>
+            <div className="bg-[#f1f1f1] rounded-[50px] mt-10 p-[25px] text-center h-[110px] !flex flex-col justify-center shadow-[0_10px_25px_rgba(0,0,0,0.15)]">
+              <div className="flex-1 text-center">
+                <h4 className="font-bold mb-2">No over-pricing</h4>
+                 <p className="m-0 text-[#555] text-[15px]">
               Cheapest costs | Competitive prices
               <br />
               Pay as you go
@@ -355,7 +358,7 @@ const HeroWithPromo = () => {
         </div>
       </div>
 
-      <div className="mobile-image"></div>
+      <div className="hidden max-md:block h-[350px] bg-[url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e')] bg-no-repeat bg-center bg-cover"></div>
     </>
   );
 };
