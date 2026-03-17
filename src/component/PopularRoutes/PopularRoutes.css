@@ -50,7 +50,7 @@
 }
 
 .right-side h1 {
-  font-size: 40px;
+  font-size: 35px;
   font-weight: 500;
   margin-bottom: 35px;
 }
@@ -66,6 +66,7 @@
   color: blue;
   display: inline-block;
   padding-bottom: 4px;
+  margin: 15px;
   transition: 0.3s;
   width: 125px !important;
 }
@@ -98,6 +99,7 @@
 .book-btn {
   background: #f4b400;
   border: none;
+  border-radius: 10px;
   padding: 12px 30px;
   font-weight: bold;
   cursor: pointer;

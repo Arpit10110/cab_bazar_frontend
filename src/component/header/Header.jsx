@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import { FaPhoneAlt, FaLocationArrow } from "react-icons/fa";
+import taxi from "/image/taxi.jpg";
 import Slider from "react-slick";
+import  './Header.css'
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useNavigate } from "react-router-dom";
@@ -108,7 +110,7 @@ const HeroWithPromo = () => {
   return (
     <>
       {/* HERO SECTION */}
-      <div className="w-full min-h-screen bg-[url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e')] bg-no-repeat bg-center bg-cover relative flex items-center max-md:bg-none max-md:min-h-auto">
+      <div className="w-full min-h-screen bg-[url('https://www.srdvtechnologies.com/assets/images/taxi-booking-services.jpg')] bg-no-repeat bg-center bg-cover relative flex items-center max-md:bg-none max-md:min-h-auto">
           <Row className="relative w-full z-[2] min-h-screen max-[450px]:!m-auto items-center max-md:min-h-[74vh] max-md:mt-10">
           <Col lg={5} md={6} xs={12} className="flex max-[450px]:!px-0  justify-start px-5 !-mt-20 max-md:!-mt-0">
               <div className="bg-[#f3f3f3] rounded-[25px] p-[25px] w-full max-w-[420px] min-h-[520px] flex flex-col justify-between max-md:!bg-transparent max-md:!w-[470px]">
@@ -256,7 +258,7 @@ const HeroWithPromo = () => {
                     <FaPhoneAlt className="absolute right-[15px] top-[12px] text-gray-500" />
                   </Form.Group>
 
-                  <Button onClick={handleCabData} className="w-full !bg-[#f5b400] !border-none p-2.5 !m-0 font-bold !rounded-[30px] flex justify-center items-center text-black">
+                  <Button onClick={handleCabData} className="w-full m-btn !bg-[#f5b400] !border-none p-2.5 !m-0 font-bold !rounded-[30px] flex justify-center items-center text-black">
                     Book Cab
                   </Button>
                 </Form>
@@ -269,17 +271,17 @@ const HeroWithPromo = () => {
       <div className="w-full flex justify-center -mt-[60px] lg:-mt-[70px] relative z-[5]">
         <div className="bg-[#efefef] w-[89%] max-w-[1200px] rounded-[80px] py-4 px-[50px] flex items-center mb-5 justify-between max-md:hidden">
           <div className="flex-1 text-center">
-  <h6 className="font-semibold mb-[15px]">Get ₹200 cashback on mobile app download</h6>
+  <h6 className="font-semibold mb-[25px] cash">Get ₹200 cashback on mobile app download</h6>
 
   <div className="d-none flex gap-2.5 mt-2.5 justify-center">
-    {/* Play Store - Always Visible */}
+    {/* Play Store - Always Visible this is a playstore link */}
     <a 
       href="https://play.google.com/store/apps" 
-      target="_blank" 
+      target="_blank"
       rel="noopener noreferrer"
     >
       <img
-        src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
+        src={taxi}
         alt="Google Play Store"
         className="h-[45px] cursor-pointer"
       />
@@ -324,7 +326,7 @@ const HeroWithPromo = () => {
           <Slider {...sliderSettings}>
             <div className="bg-[#f1f1f1] rounded-[50px] mt-10 p-[25px] text-center h-[110px] !flex flex-col justify-center shadow-[0_10px_25px_rgba(0,0,0,0.15)]">
               <div className="flex-1 text-center">
-                <h6 className="font-semibold mb-[15px] max-md:text-[17px]">Get ₹200 cashback on mobile app download</h6>
+                <h6 className="font-semibold mb-[15px] max-md:text-[17px] cash">Get ₹200 cashback on mobile app download</h6>
                  {/* <img
         src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
         alt="Google Play Store"
@@ -356,7 +358,7 @@ const HeroWithPromo = () => {
         </div>
       </div>
 
-      <div className="hidden max-md:block h-[350px] bg-[url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e')] bg-no-repeat bg-center bg-cover"></div>
+      <div className="hidden max-md:block h-[350px] bg-[url('https://www.srdvtechnologies.com/assets/images/taxi-booking-services.jpg')] bg-no-repeat bg-center bg-cover"></div>
     </>
   );
 };

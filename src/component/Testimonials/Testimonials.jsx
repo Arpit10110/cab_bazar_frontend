@@ -37,7 +37,7 @@ const Testimonials = () => {
       
       {/* Main Content */}
       <div className="testimonial-content">
-        <h1>Meet CabBazar Satisfied Customers</h1>
+        <h1>Meet ByCab Satisfied Customers</h1>
 
         {/* Top Profiles */}
         <div className="customer-row">

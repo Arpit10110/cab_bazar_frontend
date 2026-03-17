@@ -28,21 +28,21 @@ const ContactSection = () => {
 
           <div className="contact-info">
             <h4>Call us at</h4>
-            <a href="tel:08068249401" className="highlight">
-              08068249401
+            <a href="tel:918791671642" className="highlight">
+              +918791671642
             </a>
 
             <h4>Email us at</h4>
-            <p>support@ByCab.com</p>
+            <p>bycab247@gmail.com</p>
           </div>
 
           <div className="social-icons">
-            <a href="#"><FaFacebookF /></a>
-            <a href="#"><FaTwitter /></a>
-            <a href="#"><FaLinkedinIn /></a>
-            <a href="#"><FaInstagram /></a>
-            <a href="#"><FaPinterestP /></a>
-            <a href="#"><FaYoutube /></a>
+ <a href="https://www.facebook.com/profile.php?id=61583529146506&sk=about"><FaFacebookF /></a>
+            {/* <a href="#"><FaTwitter /></a> */}
+            {/* <a href="#"><FaLinkedinIn /></a> */}
+            <a href="https://www.instagram.com/bycab247/"><FaInstagram /></a>
+            {/* <a href="#"><FaPinterestP /></a> */}
+            <a href="https://www.youtube.com/@ByCab247"><FaYoutube /></a>
           </div>
         </div>
 

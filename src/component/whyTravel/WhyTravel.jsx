@@ -1,5 +1,6 @@
 import React from "react";
 import "./WhyTravel.css";
+
 // import cabImage from "../assets/cab.jpg"; // apni image path yaha daal dena
 
 const WhyTravel = () => {
@@ -8,7 +9,7 @@ const WhyTravel = () => {
       <div className="container">
         <div className="row align-items-center">
 <h2 className="main-heading">
-                Why travel with <span>CabBazar</span> ?
+                Why travel with <span>ByCab</span> ?
               </h2>
           {/* Left Image */}
           <div className="col-lg-6 mb-4 mb-lg-0">

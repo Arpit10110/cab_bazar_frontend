@@ -22,7 +22,7 @@ const TaxiServices = () => {
           {/* RIGHT CONTENT */}
           <div className="col-lg-6">
             <div className="content-box">
-              <h2 className="main-title">CabBazar Taxi Services</h2>
+              <h2 className="main-title">ByCab Taxi Services</h2>
 
               <div className="service-item">
                 <h5>Outstation Cabs</h5>

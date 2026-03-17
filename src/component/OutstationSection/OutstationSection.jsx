@@ -13,7 +13,7 @@ const OutstationSection = () => {
       <div className="container">
         <div className="row align-items-center">
  <h1 className="main-title">
-                CabBazar - Best outstation taxi service in India
+                ByCab - Best outstation taxi service in India
               </h1>
           {/* LEFT CONTENT */}
           <div className="col-lg-6 mb-4 mb-lg-0">

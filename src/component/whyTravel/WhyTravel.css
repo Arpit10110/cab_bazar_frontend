@@ -10,6 +10,7 @@
 .main-heading{
   font-size: 40px;
   padding-left: 20px;
+  margin-bottom: 20px !important;
 }
 
 @media(min-width:968px){
@@ -18,7 +19,7 @@
 }
 }
 .why-section {
-  padding: 80px 0;
+  padding: 70px 0px 0px 0px;
   background: #f3f3f3;
   position: relative;   /* IMPORTANT */
   margin-bottom: 0px;

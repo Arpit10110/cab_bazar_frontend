@@ -9,10 +9,12 @@ const PartnerPage = () => {
       <div className="left-yellow-line"></div>
 
       {/* Right Top Yellow Box */}
-      {/* <div className="right-top-yellow"></div> */}
+      {/* <div className="right-top-yello
+      
+      w"></div> */}
 
       <div className="partner-content">
-        <h1>Partner with CabBazar</h1>
+        <h1>Partner with ByCab</h1>
 
         <div className="partner-grid">
 
@@ -20,8 +22,8 @@ const PartnerPage = () => {
           <div className="partner-card">
             <h3>Attach your car (For Drivers)</h3>
             <p>
-              Drivers / Taxi service providers can partner with CabBazar to
-              attach your car with company and get business from CabBazar.
+              Drivers / Taxi service providers can partner with ByCab to
+              attach your car with company and get business from ByCab.
             </p>
             <button>KNOW MORE</button>
           </div>
@@ -30,7 +32,7 @@ const PartnerPage = () => {
           <div className="partner-card">
             <h3>Blog</h3>
             <p>
-              Stay updated with travel related information with CabBazar travel
+              Stay updated with travel related information with ByCab travel
               blogs. Interesting articles on travel tips, useful information,
               places, culture and cuisine.
             </p>
@@ -55,7 +57,7 @@ const PartnerPage = () => {
           <div className="partner-card">
             <h3>Career</h3>
             <p>
-              Interested in working at CabBazar? We're looking for talent that
+              Interested in working at ByCab? We're looking for talent that
               will help us sustainably create value to tackle the future
               mobility challenge together.
             </p>

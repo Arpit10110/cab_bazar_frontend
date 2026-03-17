@@ -23,8 +23,8 @@ const TaxiServices = () => {
             <div className="right-content">
               <h2>Get ₹200 cashback on mobile app download</h2>
 
-              <div className="store-buttons">
-                <a href="#">
+              <div className="store-buttons d-no">
+                {/* <a href="#">
                   <img
                     src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
                     alt="Google Play"
@@ -36,7 +36,9 @@ const TaxiServices = () => {
                     src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"
                     alt="App Store"
                   />
-                </a>
+                </a> */}
+<p>Bycab is a convenient online cab booking service that offers reliable, affordable, and safe rides across cities. With easy app access, professional drivers, and timely pickups, Bycab ensures comfortable travel for daily commutes, airport transfers, and outstation journeys anytime.</p>
+
               </div>
             </div>
           </div>
