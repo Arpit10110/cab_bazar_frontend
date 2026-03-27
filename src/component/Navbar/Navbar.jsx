@@ -1,6 +1,6 @@
 
 import React from "react";
-import logo from "/image/logo1.jpg";
+import logo from "/image/logo2.jpeg";
 import { Navbar, Container } from "react-bootstrap";
 import "./Navbar.css";
 

@@ -1,0 +1,99 @@
+/* Container Background */
+.faq-container {
+  background-color: #fcfdfe; /* Very light blue-white */
+  /* min-height: 80vh; */
+}
+
+/* Title Styling with Dots */
+.faq-title-wrapper {
+  position: relative;
+  display: inline-block;
+  /* color: #2c2a63; Dark Navy Blue from image */
+}
+
+.dot-decoration::before, .dot-decoration::after {
+  content: '';
+  position: absolute;
+  background: #2c2a63;
+  border-radius: 50%;
+}
+.dot-decoration::before { width: 8px; height: 8px; top: -10px; right: -5px; }
+.dot-decoration::after { width: 12px; height: 12px; top: -25px; left: 50%; }
+
+/* The Floating Card Item */
+.faq-card-item {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 18px 25px;
+  box-shadow: 0 4px 15px rgba(44, 42, 99, 0.05); /* Soft navy shadow */
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
+  list-style: none;
+}
+
+/* Question Styling */
+summary {
+  list-style: none;
+  cursor: pointer;
+  outline: none;
+}
+summary::-webkit-details-marker { display: none; }
+
+.faq-question {
+  font-size: 1.1rem;
+  font-weight: 600;
+  width: 80%;
+  color: #2c2a63;
+  padding-right: 20px;
+}
+
+/* Icon Animation Logic */
+.icon-box {
+  color: #8e8eb2;
+  font-size: 14px;
+  width: 20%;
+  width: 36px !important;
+    height: 36px !important;
+}
+
+
+.minus-icon { display: none; }
+
+details[open] .plus-icon { display: none; }
+details[open] .minus-icon { display: block; color: #2c2a63; }
+
+/* Open State Styling */
+details[open].faq-card-item {
+  border-color: rgba(44, 42, 99, 0.1);
+  box-shadow: 0 8px 25px rgba(44, 42, 99, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Answer Animation */
+.faq-answer-content {
+  animation: fadeIn 0.4s ease-out;
+  margin-top: 10px;
+  line-height: 1.6;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Desktop vs Mobile Optimization */
+@media (max-width: 768px) {
+  .faq-card-item {
+    padding: 15px 20px;
+  }
+  .faq-question {
+    font-size: 0.95rem;
+  }
+}
+
+@media (min-width: 992px) {
+  .faq-card-item:hover {
+    transform: scale(1.01);
+    box-shadow: 0 10px 30px rgba(44, 42, 99, 0.08);
+  }
+}

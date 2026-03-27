@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import { FaPhoneAlt, FaLocationArrow } from "react-icons/fa";
+import taxi from "/image/taxi.jpg";
 import Slider from "react-slick";
+import  './Header.css'
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useNavigate } from "react-router-dom";
@@ -108,20 +110,20 @@ const HeroWithPromo = () => {
   return (
     <>
       {/* HERO SECTION */}
-      <div className="w-full min-h-screen bg-[url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e')] bg-no-repeat bg-center bg-cover relative flex items-center max-md:bg-none max-md:min-h-auto">
+      <div className="w-full min-h-screen bg-[url('https://www.srdvtechnologies.com/assets/images/taxi-booking-services.jpg')] bg-no-repeat bg-center bg-cover relative flex items-center max-md:bg-none max-md:min-h-auto">
           <Row className="relative w-full z-[2] min-h-screen max-[450px]:!m-auto items-center max-md:min-h-[74vh] max-md:mt-10">
           <Col lg={5} md={6} xs={12} className="flex max-[450px]:!px-0  justify-start px-5 !-mt-20 max-md:!-mt-0">
-              <div className="bg-[#f3f3f3] rounded-[25px] p-[25px] w-full max-w-[420px] min-h-[520px] flex flex-col justify-between max-md:!bg-transparent max-md:!w-[470px]">
-                <div className="bg-[#f5b400] p-3 text-center rounded-[15px] mb-5 font-semibold">All India Cab Service</div>
+            <div className="bg-[#f3f3f3] rounded-[20px] p-[15px] w-full max-w-[380px] h-auto flex flex-col  max-md:!bg-transparent max-md:!w-full" style={{ marginLeft: "9px", gap: "10px",marginTop:"-20px" }}>
+                <div className="bg-[#f5b400]  m-head text-center rounded-[15px]  font-semibold">All India Cab Service</div>
 
-                <div className="flex gap-2.5 mb-[15px]">
+                <div className="flex  gap-2.5 mb-[1px]">
                   <Button
                     className={
                       tripType === "outstation"
                         ? "!bg-[#f5b400] !rounded-[25px] !border-none font-semibold flex-1"
-                        : "!bg-[#ddd] !rounded-[25px] !border-none flex-1 text-black"
-                    }
-                    onClick={() => setTripType("outstation")}
+                        : "!bg-[#ddd] !rounded-[25px] !border-none flex-1 text-black " 
+                    } 
+                    onClick={() => setTripType("outstation")} style={{padding:"9px"}}
                   >
                     Outstation
                   </Button>
@@ -132,14 +134,14 @@ const HeroWithPromo = () => {
                         ? "!bg-[#f5b400] !rounded-[25px] !border-none font-semibold flex-1" 
                         : "!bg-[#ddd] !rounded-[25px] !border-none flex-1 text-black"
                     }
-                    onClick={() => setTripType("local")}
+                    onClick={() => setTripType("local")} style={{padding:"9px"}}
                   >
                     Local / Airport
                   </Button>
                 </div>
 
                 {tripType === "outstation" && (
-                  <div className="flex justify-between bg-[#e9e9e9] py-2.5 px-[15px] rounded-[15px] mb-[15px] cursor-pointer">
+                  <div className="flex justify-between bg-[#e9e9e9]  px-[15px] rounded-[15px] mb-[1px] cursor-pointer" style={{padding:"9px"}}>
                     <span onClick={() => setTripMode("round")} className="flex items-center">
                       <span
                         className={
@@ -168,7 +170,7 @@ const HeroWithPromo = () => {
                   {cities.map((city, index) => (
                     <Form.Group
                       key={index}
-                      className="mb-3 relative"
+                      className="p-1 relative"
                     >
                       <Form.Control
                         type="text"
@@ -228,13 +230,14 @@ const HeroWithPromo = () => {
                   ))}
 
                   {tripType === "outstation" && (
-                    <div className="bg-[#e9d9b6] p-2.5 rounded-xl mb-[15px] text-center cursor-pointer" onClick={addCity}>
+                    <div className="bg-[#e9d9b6] p-2.5 rounded-xl mb-[8px] mt-[3px] text-center cursor-pointer" onClick={addCity}>
                       + Add More City
                     </div>
                   )}
 
                   {tripType === "local" && (
-                    <Form.Group className="mb-3">
+                    <Form.Group className="mb-1
+                    ">
                       <Form.Select className="!rounded-xl !py-3 !pr-10 !pl-[15px] !border-none !bg-[#e8e8e8c9]">
                         <option>Select Airport</option>
                         <option>Delhi Airport</option>
@@ -256,7 +259,7 @@ const HeroWithPromo = () => {
                     <FaPhoneAlt className="absolute right-[15px] top-[12px] text-gray-500" />
                   </Form.Group>
 
-                  <Button onClick={handleCabData} className="w-full !bg-[#f5b400] !border-none p-2.5 !m-0 font-bold !rounded-[30px] flex justify-center items-center text-black">
+                  <Button onClick={handleCabData} className="w-full m-btn !bg-[#f5b400] !border-none p-2.5 !m-0 font-bold !rounded-[30px] flex justify-center items-center text-black">
                     Book Cab
                   </Button>
                 </Form>
@@ -264,22 +267,23 @@ const HeroWithPromo = () => {
             </Col>
           </Row>
       </div>
+      
 
       {/* PROMO SECTION */}
-      <div className="w-full flex justify-center -mt-[60px] lg:-mt-[70px] relative z-[5]">
-        <div className="bg-[#efefef] w-[89%] max-w-[1200px] rounded-[80px] py-4 px-[50px] flex items-center mb-5 justify-between max-md:hidden">
+      <div className="w-full d-none flex justify-center -mt-[60px] lg:-mt-[70px] relative z-[5]">
+        <div className="bg-[#efefef] w-[89%] max-w-[1200px] rounded-[80px] py-3 px-[50px] flex items-center mb-5 justify-between max-md:hidden">
           <div className="flex-1 text-center">
-  <h6 className="font-semibold mb-[15px]">Get ₹200 cashback on mobile app download</h6>
+  <h6 className="font-semibold mb-[25px] cash">Get ₹200 cashback on mobile app download</h6>
 
   <div className="d-none flex gap-2.5 mt-2.5 justify-center">
-    {/* Play Store - Always Visible */}
+    {/* Play Store - Always Visible this is a playstore link */}
     <a 
       href="https://play.google.com/store/apps" 
-      target="_blank" 
+      target="_blank"
       rel="noopener noreferrer"
     >
       <img
-        src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
+        src={taxi}
         alt="Google Play Store"
         className="h-[45px] cursor-pointer"
       />
@@ -320,11 +324,11 @@ const HeroWithPromo = () => {
           </div>
         </div>
 
-        <div className="hidden max-md:block w-[95%] max-md:-mb-[105px] [&_.slick-slide]:!mb-[50px] [&_.slick-dots]:!hidden [&_.slick-slide_img]:!ml-[55px] [&_.slick-slide_img]:h-[40px]">
+        <div className="hidden d-none max-md:block w-[95%] max-md:-mb-[105px] [&_.slick-slide]:!mb-[50px] [&_.slick-dots]:!hidden [&_.slick-slide_img]:!ml-[55px] [&_.slick-slide_img]:h-[40px]">
           <Slider {...sliderSettings}>
             <div className="bg-[#f1f1f1] rounded-[50px] mt-10 p-[25px] text-center h-[110px] !flex flex-col justify-center shadow-[0_10px_25px_rgba(0,0,0,0.15)]">
               <div className="flex-1 text-center">
-                <h6 className="font-semibold mb-[15px] max-md:text-[17px]">Get ₹200 cashback on mobile app download</h6>
+                <h6 className="font-semibold mb-[15px] max-md:text-[17px] cash">Get ₹200 cashback on mobile app download</h6>
                  {/* <img
         src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
         alt="Google Play Store"
@@ -356,7 +360,7 @@ const HeroWithPromo = () => {
         </div>
       </div>
 
-      <div className="hidden max-md:block h-[350px] bg-[url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e')] bg-no-repeat bg-center bg-cover"></div>
+      <div className="hidden max-md:block h-[350px] bg-[url('https://www.srdvtechnologies.com/assets/images/taxi-booking-services.jpg')] bg-no-repeat bg-center bg-cover"></div>
     </>
   );
 };

@@ -1,0 +1,66 @@
+.journey-wrapper {
+  background: #f3f4f6;
+}
+
+.journey-title {
+  font-weight: 600;
+  color: #8b8b8b;
+}
+
+/* Card */
+.journey-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px 10px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+
+/* Item */
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Icon style */
+.icon-box {
+  width: 50px;
+  height: 50px;
+  background: #e6f7f3;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #22c55e;
+  font-size: 22px;
+  margin-bottom: 8px;
+}
+
+/* Text */
+.stat-item h6 {
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.stat-item p {
+  font-size: 13px;
+  color: #777;
+  margin: 0;
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+  .icon-box {
+    width: 42px;
+    height: 42px;
+    font-size: 18px;
+  }
+
+  .stat-item h6 {
+    font-size: 14px;
+  }
+
+  .stat-item p {
+    font-size: 12px;
+  }
+}

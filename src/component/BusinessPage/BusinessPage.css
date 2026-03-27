@@ -60,6 +60,7 @@
   padding: 12px;
   background: #f4b400;
   border: none;
+  border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
   width: 170px;

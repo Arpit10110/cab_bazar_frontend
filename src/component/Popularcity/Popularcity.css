@@ -1,0 +1,117 @@
+/* Section */
+.cab-section {
+  background: white;
+  padding: 40px 0px 0px 0px !important;
+}
+
+/* Heading */
+.text-darkorange {
+  color: #fbbf24;
+}
+
+/* Description */
+.cab-section p {
+  color: #6c757d;
+  line-height: 1.7;
+}
+
+/* Feature Box */
+.feature-item {
+  display: flex;
+  align-items: center;
+}
+
+/* Right side */
+.feature-item.justify-content-end {
+  justify-content: flex-end;
+}
+
+/* ICON SHAPE (same blob design) */
+.feature-icon {
+  width: 100px;
+  height: 70px;
+  background: #fbbf24;
+  border-radius: 50px 40px 60px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Icon style */
+.feature-icon i {
+  font-size: 22px;
+  color: #333;
+}
+
+/* Text */
+.feature-item h5 {
+  margin: 0;
+  font-weight: 500;
+}
+
+/* IMAGE */
+.center-img {
+  max-width: 360px;
+  margin: auto;
+  display: block;
+}
+.main-heading{
+  font-weight: 700;
+  font-size: 27px !important;
+}
+
+.feature-icon svg {
+  font-size: 28px;   /* size bada karo */
+}@media (max-width: 768px) {
+
+  /* pura center align */
+  .feature-item {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    justify-content: center !important;
+  }
+  .left{
+    margin-right: 40px;
+    margin-top: 10px;
+  }
+  .right{
+    margin-left: 20px;
+  }
+
+  /* text spacing fix */
+  .feature-item .ms-4,
+  .feature-item .me-4 {
+    margin: 8px 0 !important;
+    text-align: center !important;
+  }
+
+  /* icon center */
+  .feature-icon {
+    margin-bottom: 8px;
+  }
+
+  /* IMAGE PERFECT CENTER */
+  .center-img {
+    max-width: 260px;
+    margin: 30px auto;
+  }
+
+  /* RIGHT SECTION bhi LEFT jaisa ho jaye */
+  .feature-item.justify-content-end {
+    justify-content: center !important;
+  }
+
+  /* row spacing improve */
+  .row.g-4 {
+    gap: 20px;
+  }
+
+  /* text size thoda adjust */
+  .feature-item h5 {
+    font-size: 20px;
+  }
+  .cab-section p{
+    font-size: 18px;
+  }
+}

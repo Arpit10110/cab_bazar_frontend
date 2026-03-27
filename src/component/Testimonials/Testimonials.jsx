@@ -1,85 +1,103 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
+import { useKeenSlider } from "keen-slider/react";
+import "keen-slider/keen-slider.min.css";
+import rev1 from "/image/rev1.jpg";
+import rev2 from "/image/rev2.jpg";
+import rev3 from "/image/rev3.jpg";
+import rev4 from "/image/rev4.jpg";
 import "./Testimonials.css";
 
-const customers = [
+const testimonials = [
   {
-    id: 1,
-    name: "Saloni Gupta",
-    location: "New Delhi, Delhi",
-    image: "https://randomuser.me/api/portraits/women/65.jpg",
-    review:
-      "Cab service was smooth and driver was polite. Everything went perfectly and on time.",
+    name: "Melbin Jose",
+    city: "Gurgaon",
+    img: rev1,
+    review: "Best deals and smooth rides. Booking is quick and hassle-free.",
+    rating: 4,
   },
   {
-    id: 2,
-    name: "Ankita Mahawar",
-    location: "Pune, Maharashtra",
-    image: "https://randomuser.me/api/portraits/women/44.jpg",
-    review:
-      "The service was excellent- thankyou. My driver was waiting at arrival for me with clear sign. He introduced himself, was very polite and friendly and drove me without delay. I will definitely use your service again. Your service and reliability made a long stressful journey end positively. Everything went perfectly! I will be pleased to recommend this service to my family and friends.",
+    name: "Hema Purohit",
+    city: "New Delhi",
+    img: rev2,
+    review: "Comfortable ride and timely pickup. Great experience overall.",
+    rating: 4,
   },
   {
-    id: 3,
-    name: "Harshit",
-    location: "Bengaluru, Karnataka",
-    image: "https://randomuser.me/api/portraits/men/32.jpg",
-    review:
-      "Very professional service. Booking process was easy and journey was comfortable.",
+    name: "Karanvir Singh",
+    city: "Jalandhar",
+    img: rev3,
+    review: "Clean cab, polite driver and smooth journey.",
+    rating: 5,
+  },
+  {
+    name: "Rahul Sharma",
+    city: "Jaipur",
+    img:rev4,
+    review: "Affordable pricing and easy booking process.",
+    rating: 5,
   },
 ];
 
-const Testimonials = () => {
-  const [activeCustomer, setActiveCustomer] = useState(customers[1]);
+const Testimonial = () => {
+  const [sliderRef, instanceRef] = useKeenSlider({
+    loop: true,
+    slides: {
+      perView: 4,
+      spacing: 20,
+    },
+    breakpoints: {
+      "(max-width: 1024px)": {
+        slides: { perView: 2 },
+      },
+      "(max-width: 768px)": {
+        slides: { perView: 1 },
+      },
+    },
+  });
+
+  // 🔥 AUTO PLAY
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (instanceRef.current) {
+        instanceRef.current.next();
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [instanceRef]);
 
   return (
-    <section className="testimonial-section">
-      
-      
-      {/* Main Content */}
-      <div className="testimonial-content">
-        <h1>Meet CabBazar Satisfied Customers</h1>
+    <div className="testimonial-section  py-5 ">
+     <div className="container"> <h2 className="main-heading ">
+        Our{" "}
+        <span style={{ color: "#f4b400" }}>Happy Customers!</span>
+      </h2>
 
-        {/* Top Profiles */}
-        <div className="customer-row">
-          {customers.map((customer) => (
-            <div
-              key={customer.id}
-              className={`customer-item ${
-                activeCustomer.id === customer.id ? "active" : ""
-              }`}
-              onClick={() => setActiveCustomer(customer)}
-            >
-              <img src={customer.image} alt={customer.name} />
-              <div>
-                <p className="customer-name">{customer.name}</p>
-                <span className="customer-location">
-                  {customer.location}
-                </span>
+      <div ref={sliderRef} className="keen-slider py-3">
+        {testimonials.map((item, index) => (
+          <div key={index} className="keen-slider__slide">
+            <div className="testimonial-card">
+              <img src={item.img} alt="" className="profile-img" />
+
+              <h5 className="mt-4 fw-bold">{item.name}</h5>
+              <p className="text-muted">{item.city}</p>
+
+              <div className="stars">
+                {[...Array(5)].map((_, i) => (
+                  <span key={i}>
+                    {i < item.rating ? "⭐" : "☆"}
+                  </span>
+                ))}
               </div>
+
+              <p className="review mt-3">"{item.review}"</p>
             </div>
-          ))}
-        </div>
-
-        {/* Bottom Review Section */}
-        <div className="review-section">
-          <img
-            src={activeCustomer.image}
-            alt={activeCustomer.name}
-            className="large-image"
-          />
-
-          <div className="review-text">
-            <p>{activeCustomer.review}</p>
-
-            <h4>{activeCustomer.name}</h4>
-            <span>{activeCustomer.location}</span>
           </div>
-        </div>
+        ))}
       </div>
-
-     <div className="yellow-line"></div>
-    </section>
+      </div>
+    </div>
   );
 };
 
-export default Testimonials;
+export default Testimonial;

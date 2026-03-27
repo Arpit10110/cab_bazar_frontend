@@ -1,0 +1,53 @@
+.stats-wrapper {
+  background: #f8fafc;
+}
+
+.stat-box {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 12px 18px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: 0.3s;
+}
+
+.stat-box:hover {
+  transform: translateY(-3px);
+}
+
+.icon-box {
+  background: #eef2f7;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 18px;
+  color: #4a90e2;
+}
+
+.check-icon {
+  color: #22c55e;
+  margin-right: 8px;
+}
+
+p {
+  font-size: 14px;
+  margin-bottom: 8px;
+  color: #444;
+}
+
+h6 {
+  font-size: 16px;
+}
+
+/* Mobile tuning */
+@media (max-width: 576px) {
+  .stat-box {
+    padding: 10px;
+  }
+
+  h6 {
+    font-size: 14px;
+  }
+
+  p {
+    font-size: 13px;
+  }
+}

@@ -240,7 +240,6 @@ function Promo() {
           <div className="my-5 bg-[#ffcc00] p-5 rounded-[10px] flex justify-between items-center flex-wrap max-md:flex-col max-md:gap-2.5 max-md:text-center max-md:w-[320px] max-md:mx-auto">
             <div>
               <h3>Frequent Rider Plan</h3>
-              <p>Flat ₹200 off on every ride</p>
             </div>
             <button className="bg-black text-white border-none py-2.5 px-5 rounded-[20px] cursor-pointer">Buy Now</button>
           </div>

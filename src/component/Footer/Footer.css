@@ -125,7 +125,7 @@ hr {
   .social-icons1{
     justify-items: center;
     justify-content: center;
-    margin-left: 25px;
+    margin-left: -25px;
   }
 
   .route-col {

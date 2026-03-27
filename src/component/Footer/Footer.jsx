@@ -76,20 +76,22 @@ const Footer = () => {
 
         {/* App + Social */}
         <div className="footer-bottom">
-          <div className="app-buttons">
+          {/* <div className="app-buttons">
             <img src="https://cabbazar.com/assets/img/icons/playstore-badge.webp" alt="Google Play" />
             <img src="https://cabbazar.com/assets/img/icons/app-store-badge.webp" alt="App Store" />
-          </div>
+          </div> */}
 
-          <div className="social-icons1">
-            <a href="#"><FaFacebookF /></a>
-            <a href="#"><FaTwitter /></a>
-            <a href="#"><FaLinkedinIn /></a>
-            <a href="#"><FaInstagram /></a>
-            <a href="#"><FaPinterestP /></a>
-            <a href="#"><FaYoutube /></a>
-          </div>
+
         </div>
+
+          <div className="social-icons1 d-flex">
+ <a href="https://www.facebook.com/profile.php?id=61583529146506&sk=about"><FaFacebookF /></a>
+            {/* <a href="#"><FaTwitter /></a> */}
+            {/* <a href="#"><FaLinkedinIn /></a> */}
+            <a href="https://www.instagram.com/bycab247/"><FaInstagram /></a>
+            {/* <a href="#"><FaPinterestP /></a> */}
+            <a href="https://www.youtube.com/@ByCab247"><FaYoutube /></a>
+          </div>
 
         <hr />
 
@@ -99,16 +101,12 @@ const Footer = () => {
           Service Level Agreement | Career | Mobile App |
           Media Coverage | Affiliate | Blog | Sitemap
           <br />
-          Contact Us : 08068249401
+          Contact Us : +91 9045454224
         </div>
 
-        <hr />
-
+        {/* <hr /> */}
+{/*  */}
         {/* Copyright */}
-        <div className="copyright">
-          <strong>CBGrowth</strong>
-          <p>Copyright © 2021 CB Growth Private Limited</p>
-        </div>
 
       </div>
     </footer>
