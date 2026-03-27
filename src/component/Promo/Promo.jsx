@@ -4,7 +4,6 @@ import Navbar from "../Navbar/Navbar";
 import { useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import {load} from '@cashfreepayments/cashfree-js';
 
 const faqData = [
   {
@@ -25,6 +24,25 @@ For One way trip, with only one pickup and one drop, sightseeing is not included
   { question: "Can I book cab by calling customer support?", answer: "" },
 ];
 
+function loadRazorpayScript() {
+  return new Promise((resolve) => {
+    if (window.Razorpay) {
+      resolve(true);
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+}
+
+function getRazorpayKeyId() {
+  const raw =
+    import.meta.env.VITE_RAZORPAY_KEY_ID ?? import.meta.env.VITE_Razorpay_Test_Key_ID;
+  return raw != null ? String(raw).trim() : "";
+}
 
 // ✅ FAQ Component (Separate Proper Component)
 function FAQ() {
@@ -46,7 +64,9 @@ function FAQ() {
         >
           <div className="py-[15px] px-5 font-[1000] text-base flex justify-between items-center">
             {item.question}
-            <span className={`text-[#222] text-2xl transition-transform duration-300 ${openIndex === index ? 'rotate-180' : ''}`}>
+            <span
+              className={`text-[#222] text-2xl transition-transform duration-300 ${openIndex === index ? "rotate-180" : ""}`}
+            >
               {openIndex === index ? "−" : "+"}
             </span>
           </div>
@@ -64,35 +84,25 @@ function FAQ() {
   );
 }
 
-
 // ✅ MAIN COMPONENT (Promo Page)
 function Promo() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
   const [cabdata, setCabdata] = useState([]);
+  /** 'best' | 'inclusive' — same cab list for both until backend sends inclusive fares */
+  const [priceView, setPriceView] = useState("best");
   const [showModal, setShowModal] = useState(false);
   const [selectedCar, setSelectedCar] = useState(null);
   const [bookingForm, setBookingForm] = useState({
     name: "",
     mobile: "",
-    email:"",
+    email: "",
     date: "",
     time: "",
     pickupAddress: "",
   });
-   const cashfreeRef = useRef(null)
-     const initializeSDK = async () => {
-        try {
-        // Use "production" for production and "sandbox" for local
-        const instance = await load({ mode: "sandbox" })
-        // const instance = await load({ mode: "sandbox" })
-        cashfreeRef.current = instance
-        } catch (e) {
-        console.error("Cashfree SDK load failed", e)
-        ToastErrorHandler("Unable to load payment SDK. Please refresh the page.")
-        }
-        }
+  const paymentInFlight = useRef(false);
 
   const getcabdetails = async (data) => {
     try {
@@ -132,93 +142,127 @@ function Promo() {
     setShowModal(true);
   };
 
-  const getSessionId = async(pricevalue)=>{
+  const displayedCabs = cabdata;
+
+  const createRazorpayOrder = async (pricevalue) => {
     try {
-      const {data:res} = await axios.post(`${import.meta.env.VITE_API}/api/v1/createpayment-session`,{
-        amount:pricevalue,
-        user_data:bookingForm
-      })
-      if(res.data.success){
-            const orderId = res.data.data.order_id
-            console.log(res.data.data.payment_session_id);
-            return {sessionId:res.data.data.payment_session_id,orderId:orderId}
-          }else{
-          alert("something went wrong");
-          }
+      const { data: res } = await axios.post(`${import.meta.env.VITE_API}/api/v1/createpayment-session`, {
+        amount: pricevalue,
+        user_data: bookingForm,
+      });
+      if (res.data?.success && res.data?.data?.order_id) {
+        return res.data.data;
+      }
+      alert("something went wrong");
     } catch (error) {
       console.log(error);
-          alert("something went wrong");
-
+      alert("something went wrong");
     }
-  }
+    return null;
+  };
 
-   const verifyPayment = async (orderId) => {
-        try {
-          let res = await axios.post(`${import.meta.env.VITE_API}/api/v1/verify-payment`, {
-            orderId: orderId,
-          })
-          console.log(res.data)
-          if(res.data.success){
-            alert("Payment Successful !!!")
-            sendBookingData(orderId)
-          }else{
-            alert("Payment Failed !!!");
-          }
-    
-        } catch (error) {
-          console.log(error)
-          alert("Something went Wrong !!!");
-        }
-      }
-  
-  const sendBookingData = async(orderId)=>{
+  const verifyPayment = async (payload) => {
     try {
-      const {data:res} = await axios.post(`${import.meta.env.VITE_API}/api/v1/booking`,{
-        bookingForm:bookingForm,
-        selectedCar:selectedCar,
-        tripdata:data,
-        orderId:orderId
-      })
-      console.log(res)
-      if(res.success){
-        alert("Booking Successful !!!")
-        localStorage.clear()
-        navigate("/")
-      }else{
+      const res = await axios.post(`${import.meta.env.VITE_API}/api/v1/verify-payment`, payload);
+      console.log(res.data);
+      if (res.data.success) {
+        const orderId = res.data.data?.order_id ?? payload.razorpay_order_id;
+        alert("Payment Successful !!!");
+        sendBookingData(orderId);
+      } else {
+        alert("Payment Failed !!!");
+      }
+    } catch (error) {
+      console.log(error);
+      alert("Something went Wrong !!!");
+    }
+  };
+
+  const sendBookingData = async (orderId) => {
+    try {
+      const { data: res } = await axios.post(`${import.meta.env.VITE_API}/api/v1/booking`, {
+        bookingForm: bookingForm,
+        selectedCar: selectedCar,
+        tripdata: data,
+        orderId: orderId,
+      });
+      console.log(res);
+      if (res.success) {
+        alert("Booking Successful !!!");
+        localStorage.clear();
+        navigate("/");
+      } else {
         alert("Booking Failed !!!");
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
       alert("Something went Wrong !!!");
     }
-  }
-  const handleFormSubmit = async(e) => {
+  };
+
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
+    if (paymentInFlight.current) return;
+    const keyId = getRazorpayKeyId();
+    if (!keyId) {
+      alert("Razorpay Key ID is missing. Add VITE_RAZORPAY_KEY_ID to your .env file.");
+      return;
+    }
+    paymentInFlight.current = true;
     try {
-        if (!cashfreeRef.current) {
-            await initializeSDK()
-            }
-            if (!cashfreeRef.current) {
-            alert("Payment Gateway not ready. Please try again in a moment.")
-            return
-            }
-            let {sessionId,orderId} = await getSessionId(selectedCar.price)
-            let checkoutOptions = {
-                paymentSessionId : sessionId,
-                redirectTarget:"_modal",
-            }
-             const payment_result = await cashfreeRef.current.checkout(checkoutOptions)
-             if(payment_result.paymentDetails){
-                console.log(payment_result.paymentDetails)
-                verifyPayment(orderId)
-               }else{
-                alert("payment failed")
-               }
+      const scriptOk = await loadRazorpayScript();
+      if (!scriptOk || !window.Razorpay) {
+        alert("Unable to load payment SDK. Please refresh the page.");
+        paymentInFlight.current = false;
+        return;
+      }
+      const orderData = await createRazorpayOrder(selectedCar.price);
+      if (!orderData) {
+        paymentInFlight.current = false;
+        return;
+      }
+
+      const options = {
+        key: keyId,
+        amount: orderData.amount,
+        currency: orderData.currency || "INR",
+        name: "ByCab",
+        description: "Cab booking payment",
+        order_id: orderData.order_id,
+        handler: (response) => {
+          paymentInFlight.current = false;
+          verifyPayment({
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature,
+          });
+        },
+        prefill: {
+          name: bookingForm.name,
+          email: bookingForm.email,
+          contact: bookingForm.mobile,
+        },
+        theme: { color: "#ffcc00" },
+        modal: {
+          ondismiss: () => {
+            paymentInFlight.current = false;
+          },
+        },
+      };
+
+      const rz = new window.Razorpay(options);
+      rz.on("payment.failed", () => {
+        paymentInFlight.current = false;
+        alert("Payment failed");
+      });
+      rz.open();
     } catch (error) {
+      paymentInFlight.current = false;
       console.log(error);
-          alert("something went wrong");
+      alert("something went wrong");
     }
   };
+
   return (
     <>
       <Navbar />
@@ -244,17 +288,48 @@ function Promo() {
             <button className="bg-black text-white border-none py-2.5 px-5 rounded-[20px] cursor-pointer">Buy Now</button>
           </div>
 
-          <div className="flex mb-5 flex-wrap max-md:flex-col max-md:w-[320px] max-md:mx-auto">
-            <button className="flex-1 p-3 border-none cursor-pointer font-bold bg-[#ffcc00]!">Best Price</button>
-            <button className="flex-1 p-3 border-none cursor-pointer bg-[#ddd] font-bold">Toll, State tax Inclusive Price</button>
+          <div className="flex mb-5 flex-wrap max-md:flex-col max-md:w-[320px] max-md:mx-auto rounded-[10px] overflow-hidden border border-[#e5e5e5]">
+            <button
+              type="button"
+              className={`flex-1 p-3 border-none cursor-pointer font-bold transition-colors duration-200 min-h-[48px] max-md:text-sm ${
+                priceView === "best" ? "bg-[#ffcc00] text-black" : "bg-[#ddd] text-[#333]"
+              }`}
+              onClick={() => setPriceView("best")}
+              aria-pressed={priceView === "best"}
+            >
+              Best Price
+            </button>
+            <button
+              type="button"
+              className={`flex-1 p-3 border-none cursor-pointer font-bold transition-colors duration-200 min-h-[48px] max-md:text-sm leading-snug ${
+                priceView === "inclusive" ? "bg-[#ffcc00] text-black" : "bg-[#ddd] text-[#333]"
+              }`}
+              onClick={() => setPriceView("inclusive")}
+              aria-pressed={priceView === "inclusive"}
+            >
+              Toll, State tax Inclusive Price
+            </button>
           </div>
 
+          <p className="text-sm text-[#555] mb-4 max-md:text-center max-md:px-1">
+            {priceView === "best"
+              ? "Showing best price options."
+              : "Showing toll & state tax inclusive prices (same options for now)."}
+          </p>
+
           <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-5">
-            {cabdata.map((car, index) => (
-              <div className="bg-white rounded-xl p-5 shadow-[0_4px_12px_rgba(0,0,0,0.1)] flex flex-col justify-between max-md:w-[320px] max-md:mx-auto" key={index}>
+            {displayedCabs.map((car, index) => (
+              <div
+                className="bg-white rounded-xl p-5 shadow-[0_4px_12px_rgba(0,0,0,0.1)] flex flex-col justify-between max-md:w-[320px] max-md:mx-auto"
+                key={index}
+              >
                 <div className="relative w-full flex justify-center items-center">
                   <img src={car.img} alt="car" className="w-full max-w-[300px] h-auto object-contain max-md:max-w-[200px]" />
-                  <img src={car.img1} alt="badge" className="absolute -top-[55px] -left-[12px] w-[100px]! h-auto z-2 max-md:w-[60px]! max-md:-top-[40px] max-md:left-[60px]" />
+                  <img
+                    src={car.img1}
+                    alt="badge"
+                    className="absolute -top-[55px] -left-[12px] w-[100px]! h-auto z-2 max-md:w-[60px]! max-md:-top-[40px] max-md:left-[60px]"
+                  />
                 </div>
 
                 <div className="text-center my-[15px]">
@@ -282,7 +357,10 @@ function Promo() {
                   </p>
                 </div>
 
-                <button className="mt-[15px] p-3 bg-[#ffcc00] hover:bg-[#ffaa00] border-none rounded-[25px] font-bold cursor-pointer transition duration-300" onClick={() => handleBookNowClick(car)}>
+                <button
+                  className="mt-[15px] p-3 bg-[#ffcc00] hover:bg-[#ffaa00] border-none rounded-[25px] font-bold cursor-pointer transition duration-300"
+                  onClick={() => handleBookNowClick(car)}
+                >
                   Book Now
                 </button>
               </div>
@@ -295,10 +373,15 @@ function Promo() {
       {showModal && (
         <div className="fixed top-0 left-0 w-full h-full bg-black/60 backdrop-blur-[5px] flex justify-center items-center z-1000 animate-[fadeIn_0.3s_ease-out]">
           <div className="bg-white/95 p-[30px] max-h-[85vh] max-md:p-[24px_20px] max-md:max-h-[90vh] overflow-y-auto rounded-3xl w-[90%] z-100 max-w-[480px] relative shadow-[0_20px_40px_rgba(0,0,0,0.2),inset_0_0_0_1px_rgba(255,255,255,0.5)] animate-[slideUp_0.4s_cubic-bezier(0.16,1,0.3,1)]">
-            <button className="absolute top-5 right-5 bg-[#f0f0f0] border-none text-[1.5rem] w-9 h-9 rounded-full flex justify-center items-center cursor-pointer text-[#666] transition-all duration-200 hover:bg-[#e0e0e0] hover:text-black hover:rotate-90" onClick={() => setShowModal(false)}>
+            <button
+              className="absolute top-5 right-5 bg-[#f0f0f0] border-none text-[1.5rem] w-9 h-9 rounded-full flex justify-center items-center cursor-pointer text-[#666] transition-all duration-200 hover:bg-[#e0e0e0] hover:text-black hover:rotate-90"
+              onClick={() => setShowModal(false)}
+            >
               &times;
             </button>
-            <h3 className="mb-[25px] text-[1.75rem] font-extrabold text-[#1a1a1a] text-center tracking-[-0.5px]">Complete Your Booking</h3>
+            <h3 className="mb-[25px] text-[1.75rem] font-extrabold text-[#1a1a1a] text-center tracking-[-0.5px]">
+              Complete Your Booking
+            </h3>
             <form onSubmit={handleFormSubmit}>
               <div className="mb-5">
                 <label className="block mb-2 font-semibold text-[0.85rem] text-[#444] uppercase tracking-[0.5px]">Name</label>
@@ -313,7 +396,9 @@ function Promo() {
                 />
               </div>
               <div className="mb-5">
-                <label className="block mb-2 font-semibold text-[0.85rem] text-[#444] uppercase tracking-[0.5px]">Mobile Number</label>
+                <label className="block mb-2 font-semibold text-[0.85rem] text-[#444] uppercase tracking-[0.5px]">
+                  Mobile Number
+                </label>
                 <input
                   type="text"
                   name="mobile"
@@ -360,7 +445,9 @@ function Promo() {
                 />
               </div>
               <div className="mb-5">
-                <label className="block mb-2 font-semibold text-[0.85rem] text-[#444] uppercase tracking-[0.5px]">Pickup Address</label>
+                <label className="block mb-2 font-semibold text-[0.85rem] text-[#444] uppercase tracking-[0.5px]">
+                  Pickup Address
+                </label>
                 <input
                   type="text"
                   name="pickupAddress"
@@ -371,7 +458,10 @@ function Promo() {
                   className="w-full p-[14px_18px] border-2 border-[#eee] rounded-xl text-[1rem] bg-[#fafafa] transition-all duration-200 focus:border-[#ffcc00] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#ffcc00]/15"
                 />
               </div>
-              <button type="submit" className="w-full p-[18px] bg-[#ffcc00] hover:bg-[#ffaa00] border-none rounded-[14px] text-[1.1rem] font-extrabold text-black cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] mt-[15px] hover:-translate-y-[3px] hover:shadow-[0_10px_20px_rgba(255,170,0,0.4)] active:-translate-y-px">
+              <button
+                type="submit"
+                className="w-full p-[18px] bg-[#ffcc00] hover:bg-[#ffaa00] border-none rounded-[14px] text-[1.1rem] font-extrabold text-black cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] mt-[15px] hover:-translate-y-[3px] hover:shadow-[0_10px_20px_rgba(255,170,0,0.4)] active:-translate-y-px"
+              >
                 Confirm Booking
               </button>
             </form>
