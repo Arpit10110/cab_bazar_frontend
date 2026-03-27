@@ -10,7 +10,8 @@ const WhyTravel = () => {
       <div className="container">
         <div className="row align-items-center">
 <h2 className="main-heading">
-                Why travel with <span style={{color:"#fbbf24"}}>ByCab</span> ?
+                Why travel with{" "}
+                <span style={{ color: "#fbbf24" }}>ByCab</span> ?
               </h2>
           {/* Left Image */}
           <div className="col-lg-6 mb-4 mb-lg-0">

@@ -67,13 +67,13 @@ const Testimonial = () => {
   }, [instanceRef]);
 
   return (
-    <div className="testimonial-section  py-5 ">
-     <div className="container"> <h2 className="main-heading ">
-        Our{" "}
-        <span style={{ color: "#f4b400" }}>Happy Customers!</span>
-      </h2>
+    <div className="testimonial-section py-5">
+      <div className="container">
+        <h2 className="main-heading">
+          Our <span style={{ color: "#f4b400" }}>Happy Customers!</span>
+        </h2>
 
-      <div ref={sliderRef} className="keen-slider py-3">
+        <div ref={sliderRef} className="keen-slider py-3">
         {testimonials.map((item, index) => (
           <div key={index} className="keen-slider__slide">
             <div className="testimonial-card">
@@ -94,7 +94,7 @@ const Testimonial = () => {
             </div>
           </div>
         ))}
-      </div>
+        </div>
       </div>
     </div>
   );

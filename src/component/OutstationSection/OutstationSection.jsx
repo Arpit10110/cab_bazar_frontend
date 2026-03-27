@@ -12,9 +12,10 @@ const OutstationSection = () => {
       
       <div className="container">
         <div className="row align-items-center">
- <h1 className="main-heading">
-              Best  outstation  <span style={{color:"#fbbf24"}}>taxi service</span> 
-              </h1>
+<h1 className="main-title">
+              ByCab — Best outstation{" "}
+              <span style={{ color: "#fbbf24" }}>taxi service</span> in India
+            </h1>
           {/* LEFT CONTENT */}
           <div className="col-lg-6 mb-4 left-sec mb-lg-0">
 <div className="content-box">
@@ -57,19 +58,11 @@ const OutstationSection = () => {
           {/* RIGHT VIDEO */}
           <div className="col-lg-6 right-sec">
             <div className="video-wrapper">
-              <iframe
+              <img
                 className="video-frame"
-            img={car}
-                title="CabBazar Video"
-                frameBorder="0"
-                allowFullScreen
-              ></iframe>
-
-              <img  className="video-frame"
-          
-                title="CabBazar Video"
-                frameBorder="0"
-                allowFullScreen src={car} alt="" />
+                src={car}
+                alt="ByCab outstation cab"
+              />
             </div>
           </div>
 
