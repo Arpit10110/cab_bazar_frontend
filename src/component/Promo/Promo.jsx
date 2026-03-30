@@ -90,7 +90,11 @@ function Promo() {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
   const [cabdata, setCabdata] = useState([]);
-  /** 'best' | 'inclusive' — same cab list for both until backend sends inclusive fares */
+  const [distanceKm, setDistanceKm] = useState(null);
+  const [billKm, setBillKm] = useState(null);
+  const [cabFetchError, setCabFetchError] = useState(null);
+  const [cabsLoading, setCabsLoading] = useState(false);
+  /** 'best' | 'inclusive' — round trip only */
   const [priceView, setPriceView] = useState("best");
   const [showModal, setShowModal] = useState(false);
   const [selectedCar, setSelectedCar] = useState(null);
@@ -104,33 +108,72 @@ function Promo() {
   });
   const paymentInFlight = useRef(false);
 
-  const getcabdetails = async (data) => {
-    try {
-      const { data: res } = await axios.post(`${import.meta.env.VITE_API}/api/v1/getcabdetails`, {
-        cities: data.cities,
-        tripType: data.tripType,
-        tripModel: data.tripModel,
-        mobile: data.mobile,
-      });
-      console.log(res);
-      setCabdata(res);
-    } catch (error) {
-      console.error("Error fetching cab details:", error);
-    }
-  };
-
   useEffect(() => {
     const bookingdata = localStorage.getItem("bookingdata");
     if (bookingdata) {
       const parsedData = JSON.parse(bookingdata);
       setData(parsedData);
       setBookingForm((prev) => ({ ...prev, mobile: parsedData.mobile || "" }));
-      getcabdetails(parsedData);
     } else {
       navigate("/");
     }
     setLoading(false);
-  }, []);
+  }, [navigate]);
+
+  useEffect(() => {
+    if (!data) return undefined;
+    let cancelled = false;
+    const run = async () => {
+      setCabsLoading(true);
+      setCabFetchError(null);
+      try {
+        const pv = data.tripMode === "round" ? priceView : "best";
+        const { data: res } = await axios.post(
+          `${import.meta.env.VITE_API}/api/v1/getcabdetails`,
+          {
+            cities: data.cities,
+            tripType: data.tripType,
+            tripMode: data.tripMode,
+            mobile: data.mobile,
+            placeIds: data.placeIds ?? [],
+            priceView: pv,
+          },
+        );
+        if (cancelled) return;
+        if (res?.cabs) {
+          setCabdata(res.cabs);
+          setDistanceKm(res.distanceKm ?? null);
+          setBillKm(res.billKm ?? null);
+        } else if (Array.isArray(res)) {
+          setCabdata(res);
+          setDistanceKm(null);
+          setBillKm(null);
+        } else {
+          setCabdata([]);
+          setDistanceKm(null);
+          setBillKm(null);
+        }
+      } catch (error) {
+        if (cancelled) return;
+        console.error("Error fetching cab details:", error);
+        setCabdata([]);
+        setDistanceKm(null);
+        setBillKm(null);
+        const msg =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          error.message ||
+          "Could not load cab prices.";
+        setCabFetchError(msg);
+      } finally {
+        if (!cancelled) setCabsLoading(false);
+      }
+    };
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [data, priceView]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -263,22 +306,68 @@ function Promo() {
     }
   };
 
+  const spinnerLg = (
+    <div
+      className="h-14 w-14 rounded-full border-[4px] border-[#e8e8e8] border-t-[#ffcc00] border-r-[#ffcc00] animate-spin"
+      aria-hidden
+    />
+  );
+
+  const pageLoader = (
+    <div
+      className="flex flex-col items-center justify-center py-20 px-6 min-h-[260px] w-full"
+      role="status"
+      aria-live="polite"
+    >
+      {spinnerLg}
+      <p className="mt-6 text-lg font-semibold text-[#1a1a1a] tracking-tight">Loading your trip</p>
+      <p className="mt-1.5 text-sm text-[#666] text-center max-w-sm">Please wait…</p>
+    </div>
+  );
+
+  const cabLoader = (
+    <div
+      className="flex flex-col items-center justify-center py-20 px-6 min-h-[260px] w-full"
+      role="status"
+      aria-live="polite"
+    >
+      {spinnerLg}
+      <p className="mt-6 text-lg font-semibold text-[#1a1a1a] tracking-tight">Loading cab options</p>
+      <p className="mt-1.5 text-sm text-[#666] text-center max-w-sm">
+        Calculating fares for your route…
+      </p>
+    </div>
+  );
+
   return (
     <>
       <Navbar />
       {loading ? (
-        <div>Loading...</div>
+        <div
+          className="min-h-[60vh] flex items-center justify-center px-4"
+          style={{ marginTop: "70px" }}
+        >
+          {pageLoader}
+        </div>
       ) : data === null ? (
         <div></div>
       ) : (
-        <div className="p-2.5 max-md:mx-auto" style={{ marginTop: "70px" }}>
+        <div className="px-4 py-4 max-w-[1200px] mx-auto max-md:px-3" style={{ marginTop: "70px" }}>
           <div className="bg-black text-white p-5 rounded-[10px]">
             <div className="text-center font-bold mb-2.5">Trip Type : {data.tripType}</div>
             <div className="flex justify-center gap-2.5 font-medium flex-wrap">
-              <span>{data.cities[0]}</span>
+              <span>{data.cities?.[0]}</span>
               <span>➜</span>
-              <span>{data.cities[1]}</span>
+              <span>{data.cities?.[1]}</span>
             </div>
+            {distanceKm != null && (
+              <div className="text-center text-sm mt-3 text-white/85">
+                One-way route ~{distanceKm} km
+                {data.tripMode === "round" && billKm != null && (
+                  <span> · Billed {billKm} km (round trip)</span>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="my-5 bg-[#ffcc00] p-5 rounded-[10px] flex justify-between items-center flex-wrap max-md:flex-col max-md:gap-2.5 max-md:text-center max-md:w-[320px] max-md:mx-auto">
@@ -288,83 +377,123 @@ function Promo() {
             <button className="bg-black text-white border-none py-2.5 px-5 rounded-[20px] cursor-pointer">Buy Now</button>
           </div>
 
-          <div className="flex mb-5 flex-wrap max-md:flex-col max-md:w-[320px] max-md:mx-auto rounded-[10px] overflow-hidden border border-[#e5e5e5]">
-            <button
-              type="button"
-              className={`flex-1 p-3 border-none cursor-pointer font-bold transition-colors duration-200 min-h-[48px] max-md:text-sm ${
-                priceView === "best" ? "bg-[#ffcc00] text-black" : "bg-[#ddd] text-[#333]"
-              }`}
-              onClick={() => setPriceView("best")}
-              aria-pressed={priceView === "best"}
-            >
-              Best Price
-            </button>
-            <button
-              type="button"
-              className={`flex-1 p-3 border-none cursor-pointer font-bold transition-colors duration-200 min-h-[48px] max-md:text-sm leading-snug ${
-                priceView === "inclusive" ? "bg-[#ffcc00] text-black" : "bg-[#ddd] text-[#333]"
-              }`}
-              onClick={() => setPriceView("inclusive")}
-              aria-pressed={priceView === "inclusive"}
-            >
-              Toll, State tax Inclusive Price
-            </button>
-          </div>
-
-          <p className="text-sm text-[#555] mb-4 max-md:text-center max-md:px-1">
-            {priceView === "best"
-              ? "Showing best price options."
-              : "Showing toll & state tax inclusive prices (same options for now)."}
-          </p>
-
-          <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-5">
-            {displayedCabs.map((car, index) => (
-              <div
-                className="bg-white rounded-xl p-5 shadow-[0_4px_12px_rgba(0,0,0,0.1)] flex flex-col justify-between max-md:w-[320px] max-md:mx-auto"
-                key={index}
-              >
-                <div className="relative w-full flex justify-center items-center">
-                  <img src={car.img} alt="car" className="w-full max-w-[300px] h-auto object-contain max-md:max-w-[200px]" />
-                  <img
-                    src={car.img1}
-                    alt="badge"
-                    className="absolute -top-[55px] -left-[12px] w-[100px]! h-auto z-2 max-md:w-[60px]! max-md:-top-[40px] max-md:left-[60px]"
-                  />
-                </div>
-
-                <div className="text-center my-[15px]">
-                  <span className="line-through text-red-500 text-[14px]">₹ {car.oldPrice}</span>
-                  <h2 className="text-green-600 my-1">₹ {car.price}</h2>
-                  <p className="text-[13px] text-[#0077cc] font-bold">{car.type}</p>
-                  <p className="text-[14px] mt-1">{car.name}</p>
-                </div>
-
-                <div className="[&>p]:text-[13px] [&>p]:my-1">
-                  <p>
-                    <strong>Included Km:</strong> 10 Km
-                  </p>
-                  <p>
-                    <strong>Extra fare/Km:</strong> {car.extra}
-                  </p>
-                  <p>
-                    <strong>Fuel Charges:</strong> Included
-                  </p>
-                  <p>
-                    <strong>Driver Charges:</strong> Included
-                  </p>
-                  <p>
-                    <strong>Night Charges:</strong> Included
-                  </p>
-                </div>
-
+          {data.tripMode === "round" && (
+            <>
+              <div className="flex mb-5 flex-wrap max-md:flex-col max-md:w-[320px] max-md:mx-auto rounded-[10px] overflow-hidden border border-[#e5e5e5]">
                 <button
-                  className="mt-[15px] p-3 bg-[#ffcc00] hover:bg-[#ffaa00] border-none rounded-[25px] font-bold cursor-pointer transition duration-300"
-                  onClick={() => handleBookNowClick(car)}
+                  type="button"
+                  className={`flex-1 p-3 border-none cursor-pointer font-bold transition-colors duration-200 min-h-[48px] max-md:text-sm ${
+                    priceView === "best" ? "bg-[#ffcc00] text-black" : "bg-[#ddd] text-[#333]"
+                  }`}
+                  onClick={() => setPriceView("best")}
+                  aria-pressed={priceView === "best"}
                 >
-                  Book Now
+                  Best Price
+                </button>
+                <button
+                  type="button"
+                  className={`flex-1 p-3 border-none cursor-pointer font-bold transition-colors duration-200 min-h-[48px] max-md:text-sm leading-snug ${
+                    priceView === "inclusive" ? "bg-[#ffcc00] text-black" : "bg-[#ddd] text-[#333]"
+                  }`}
+                  onClick={() => setPriceView("inclusive")}
+                  aria-pressed={priceView === "inclusive"}
+                >
+                  Toll, State tax Inclusive Price
                 </button>
               </div>
-            ))}
+            </>
+          )}
+
+          {cabFetchError && (
+            <p className="text-sm text-red-600 mb-4 text-center sm:text-left" role="alert">
+              {cabFetchError}
+            </p>
+          )}
+
+          <div className="relative">
+            {cabsLoading && displayedCabs.length > 0 && (
+              <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-white/75 backdrop-blur-[2px] min-h-[200px]">
+                <div className="flex flex-col items-center rounded-2xl bg-white px-8 py-6 shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-[#eee]">
+                  <div
+                    className="h-10 w-10 rounded-full border-[3px] border-[#eee] border-t-[#ffcc00] animate-spin"
+                    aria-hidden
+                  />
+                  <p className="mt-3 text-sm font-semibold text-[#333]">Updating prices…</p>
+                </div>
+              </div>
+            )}
+
+            {cabsLoading && displayedCabs.length === 0 ? (
+              cabLoader
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+                {displayedCabs.map((car, index) => (
+                  <div
+                    className="bg-white rounded-2xl p-6 md:p-7 lg:p-8 border border-[#eaeaea] shadow-[0_8px_30px_rgba(0,0,0,0.06)] flex flex-col justify-between transition-shadow duration-300 hover:shadow-[0_12px_40px_rgba(0,0,0,0.09)]"
+                    key={index}
+                  >
+                    <div className="relative w-full flex justify-center items-center pt-2 pb-1 min-h-[140px] md:min-h-[160px]">
+                      <img
+                        src={car.img}
+                        alt=""
+                        className="w-full max-w-[min(100%,320px)] h-auto object-contain max-h-[150px] md:max-h-[170px]"
+                      />
+                      <img
+                        src={car.img1}
+                        alt=""
+                        className="absolute top-0 left-0 w-[88px] md:w-[100px] h-auto z-[1] drop-shadow-md"
+                      />
+                    </div>
+
+                    <div className="text-center mt-5 mb-4">
+                      <div className="text-red-500 text-sm line-through decoration-2 opacity-90">₹ {car.oldPrice}</div>
+                      <h2 className="text-[1.85rem] md:text-[2rem] font-extrabold text-green-600 leading-tight mt-1 tracking-tight">
+                        ₹ {car.price}
+                      </h2>
+                      <p className="text-[0.8rem] md:text-sm text-[#0077cc] font-bold uppercase tracking-wide mt-3 leading-snug px-1">
+                        {car.type}
+                      </p>
+                      <p className="text-[0.95rem] text-[#555] mt-2 leading-snug">{car.name}</p>
+                    </div>
+
+                    <div className="rounded-xl bg-[#f8f9fa] border border-[#eee] px-4 py-4 text-left space-y-2.5 text-[13px] md:text-sm text-[#333]">
+                      <p>
+                        <span className="font-semibold text-[#1a1a1a]">Route (one-way):</span>{" "}
+                        {distanceKm != null ? `${distanceKm} km` : "—"}
+                      </p>
+                      {data.tripMode === "round" && (
+                        <p>
+                          <span className="font-semibold text-[#1a1a1a]">Billed distance:</span>{" "}
+                          {billKm != null ? `${billKm} km` : "—"}
+                        </p>
+                      )}
+                      <p className="text-[#444] leading-relaxed">
+                        <span className="font-semibold text-[#1a1a1a]">Extra fare/Km:</span> {car.extra}
+                      </p>
+                      <div className="pt-2 border-t border-[#e5e5e5] space-y-1 text-[#555]">
+                        <p>
+                          <span className="font-medium text-[#333]">Fuel:</span> Included
+                        </p>
+                        <p>
+                          <span className="font-medium text-[#333]">Driver:</span> Included
+                        </p>
+                        <p>
+                          <span className="font-medium text-[#333]">Night:</span> Included
+                        </p>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="mt-6 w-full py-3.5 px-6 bg-[#ffcc00] hover:bg-[#ffaa00] active:scale-[0.98] border-none rounded-full text-base font-bold text-black cursor-pointer transition-all duration-200 shadow-[0_4px_14px_rgba(255,170,0,0.35)]"
+                      onClick={() => handleBookNowClick(car)}
+                    >
+                      Book Now
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}

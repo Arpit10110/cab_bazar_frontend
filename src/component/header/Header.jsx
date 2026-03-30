@@ -14,6 +14,7 @@ const HeroWithPromo = () => {
   const [tripMode, setTripMode] = useState("round");
   const [mobile, setMobile] = useState("");
   const [cities, setCities] = useState(["", ""]);
+  const [placeIds, setPlaceIds] = useState(["", ""]);
   const [suggestions, setSuggestions] = useState([]);
   const [activeIndex, setActiveIndex] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -52,6 +53,10 @@ const HeroWithPromo = () => {
     const updated = [...cities];
     updated[index] = value;
     setCities(updated);
+    const nextPlaceIds = updated.map((_, i) =>
+      i === index ? "" : placeIds[i] ?? "",
+    );
+    setPlaceIds(nextPlaceIds);
     setActiveIndex(index);
 
     // Clear previous timer
@@ -70,6 +75,7 @@ const HeroWithPromo = () => {
 
   const addCity = () => {
     setCities([...cities, ""]);
+    setPlaceIds([...placeIds, ""]);
   };
 
   // ✅ Close suggestions on outside click
@@ -91,21 +97,25 @@ const HeroWithPromo = () => {
     slidesToScroll: 1,
   };
 
-  const handleCabData = async()=>{
-    console.log("tripType",tripType);
-    console.log("tripMode",tripMode);
-    console.log("cities",cities);
-    console.log("mobile",mobile);
-    //save data in local storage
-    const bookingdata={
+  const handleCabData = () => {
+    if (tripType === "outstation") {
+      const pickupId = String(placeIds[0] ?? "").trim();
+      const destId = String(placeIds[1] ?? "").trim();
+      if (!pickupId || !destId) {
+        alert("Please choose pickup and destination from the suggestions list so we can calculate distance.");
+        return;
+      }
+    }
+    const bookingdata = {
       tripType,
       tripMode,
       cities,
-      mobile
-    }
-    localStorage.setItem("bookingdata",JSON.stringify(bookingdata));
+      placeIds,
+      mobile,
+    };
+    localStorage.setItem("bookingdata", JSON.stringify(bookingdata));
     navigate("/cablist");
-  }
+  };
 
   return (
     <>
@@ -207,6 +217,9 @@ const HeroWithPromo = () => {
                                     const updated = [...cities];
                                     updated[index] = item.description;
                                     setCities(updated);
+                                    const nextIds = [...placeIds];
+                                    nextIds[index] = item.place_id;
+                                    setPlaceIds(nextIds);
                                     setSuggestions([]);
                                   }}
                                 >
