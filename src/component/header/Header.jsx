@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Container, Row, Col, Form, Button } from "react-bootstrap";
+import { Row, Col, Form, Button, Toast, ToastContainer } from "react-bootstrap";
 import { FaPhoneAlt, FaLocationArrow } from "react-icons/fa";
 import taxi from "/image/taxi.jpg";
 import Slider from "react-slick";
@@ -18,6 +18,9 @@ const HeroWithPromo = () => {
   const [suggestions, setSuggestions] = useState([]);
   const [activeIndex, setActiveIndex] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [airport, setAirport] = useState("");
+  const [toastShow, setToastShow] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
 
   // ✅ Debounce timer reference
   const debounceRef = useRef(null);
@@ -97,21 +100,41 @@ const HeroWithPromo = () => {
     slidesToScroll: 1,
   };
 
+  const showFormToast = (message) => {
+    setToastMessage(message);
+    setToastShow(true);
+  };
+
   const handleCabData = () => {
-    if (tripType === "outstation") {
-      const pickupId = String(placeIds[0] ?? "").trim();
-      const destId = String(placeIds[1] ?? "").trim();
-      if (!pickupId || !destId) {
-        alert("Please choose pickup and destination from the suggestions list so we can calculate distance.");
-        return;
-      }
+    const mobileDigits = String(mobile ?? "").replace(/\D/g, "");
+    if (mobileDigits.length < 10) {
+      showFormToast("Please enter a valid 10-digit mobile number.");
+      return;
     }
+
+    if (tripType === "outstation") {
+      for (let i = 0; i < cities.length; i += 1) {
+        if (!String(cities[i] ?? "").trim()) {
+          showFormToast("Please fill in pickup, destination, and any extra cities.");
+          return;
+        }
+        if (!String(placeIds[i] ?? "").trim()) {
+          showFormToast("Select each location from the suggestions list so we can calculate distance.");
+          return;
+        }
+      }
+    } else if (!String(airport ?? "").trim()) {
+      showFormToast("Please select an airport.");
+      return;
+    }
+
     const bookingdata = {
       tripType,
       tripMode,
       cities,
       placeIds,
-      mobile,
+      mobile: mobileDigits.slice(-10),
+      airport: tripType === "local" ? airport : undefined,
     };
     localStorage.setItem("bookingdata", JSON.stringify(bookingdata));
     navigate("/cablist");
@@ -119,6 +142,21 @@ const HeroWithPromo = () => {
 
   return (
     <>
+      <ToastContainer position="top-end" className="p-3" style={{ zIndex: 1080 }}>
+        <Toast
+          bg="dark"
+          show={toastShow}
+          onClose={() => setToastShow(false)}
+          delay={4500}
+          autohide
+        >
+          <Toast.Header closeButton>
+            <strong className="me-auto">ByCab</strong>
+          </Toast.Header>
+          <Toast.Body className="text-white">{toastMessage}</Toast.Body>
+        </Toast>
+      </ToastContainer>
+
       {/* HERO SECTION */}
       <div className="w-full min-h-screen bg-[url('https://www.srdvtechnologies.com/assets/images/taxi-booking-services.jpg')] bg-no-repeat bg-center bg-cover relative flex items-center max-md:bg-none max-md:min-h-auto">
           <Row className="relative w-full z-[2] min-h-screen max-[450px]:!m-auto items-center max-md:min-h-[74vh] max-md:mt-10">
@@ -249,13 +287,16 @@ const HeroWithPromo = () => {
                   )}
 
                   {tripType === "local" && (
-                    <Form.Group className="mb-1
-                    ">
-                      <Form.Select className="!rounded-xl !py-3 !pr-10 !pl-[15px] !border-none !bg-[#e8e8e8c9]">
-                        <option>Select Airport</option>
-                        <option>Delhi Airport</option>
-                        <option>Mumbai Airport</option>
-                        <option>Bangalore Airport</option>
+                    <Form.Group className="mb-1">
+                      <Form.Select
+                        value={airport}
+                        onChange={(e) => setAirport(e.target.value)}
+                        className="!rounded-xl !py-3 !pr-10 !pl-[15px] !border-none !bg-[#e8e8e8c9]"
+                      >
+                        <option value="">Select Airport</option>
+                        <option value="Delhi Airport">Delhi Airport</option>
+                        <option value="Mumbai Airport">Mumbai Airport</option>
+                        <option value="Bangalore Airport">Bangalore Airport</option>
                       </Form.Select>
                     </Form.Group>
                   )}
@@ -272,7 +313,11 @@ const HeroWithPromo = () => {
                     <FaPhoneAlt className="absolute right-[15px] top-[12px] text-gray-500" />
                   </Form.Group>
 
-                  <Button onClick={handleCabData} className="w-full m-btn !bg-[#f5b400] !border-none p-2.5 !m-0 font-bold !rounded-[30px] flex justify-center items-center text-black">
+                  <Button
+                    type="button"
+                    onClick={handleCabData}
+                    className="w-full m-btn !bg-[#f5b400] !border-none p-2.5 !m-0 font-bold !rounded-[30px] flex justify-center items-center text-black"
+                  >
                     Book Cab
                   </Button>
                 </Form>

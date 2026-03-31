@@ -430,10 +430,10 @@ function Promo() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
                 {displayedCabs.map((car, index) => (
                   <div
-                    className="bg-white rounded-2xl p-6 md:p-7 lg:p-8 border border-[#eaeaea] shadow-[0_8px_30px_rgba(0,0,0,0.06)] flex flex-col justify-between transition-shadow duration-300 hover:shadow-[0_12px_40px_rgba(0,0,0,0.09)]"
+                    className="bg-white rounded-2xl p-6 md:p-7 lg:p-8 border border-[#eaeaea] shadow-[0_8px_30px_rgba(0,0,0,0.06)] flex flex-col items-stretch transition-shadow duration-300 hover:shadow-[0_12px_40px_rgba(0,0,0,0.09)]"
                     key={index}
                   >
-                    <div className="relative w-full flex justify-center items-center pt-2 pb-1 min-h-[140px] md:min-h-[160px]">
+                    <div className="relative w-full flex justify-center items-center pt-2 pb-1 min-h-[140px] md:min-h-[160px] shrink-0">
                       <img
                         src={car.img}
                         alt=""
@@ -446,10 +446,10 @@ function Promo() {
                       />
                     </div>
 
-                    <div className="text-center mt-5 mb-4">
+                    <div className="text-center mt-5 mb-4 shrink-0">
                       <div className="text-red-500 text-sm line-through decoration-2 opacity-90">₹ {car.oldPrice}</div>
-                      <h2 className="text-[1.85rem] md:text-[2rem] font-extrabold text-green-600 leading-tight mt-1 tracking-tight" >
-                       <span className="prs">₹ {car.price}</span> 
+                      <h2 className="text-[1.85rem] md:text-[2rem] font-extrabold text-green-600 leading-tight mt-1 tracking-tight">
+                        <span className="prs">₹ {car.price}</span>
                       </h2>
                       <p className="text-[0.8rem] md:text-sm text-[#0077cc] font-bold uppercase tracking-wide mt-3 leading-snug px-1">
                         {car.type}
@@ -457,45 +457,41 @@ function Promo() {
                       <p className="text-[0.95rem] text-[#555] mt-2 leading-snug">{car.name}</p>
                     </div>
 
-                    <div className="rounded-xl bg-[#f8f9fa] border border-[#eee] px-4 py-4 text-left space-y-2.5 text-[13px] md:text-sm text-[#333]">
-                      <p>
-                        <span className="font-semibold text-[#1a1a1a]">Included Km:</span>     <span className="inc">{" "}
-                        {distanceKm != null ? `${distanceKm} km` : "—"}</span>
-                      </p>
-                      {/* {data.tripMode === "round" && (
-                        <p>
-                          <span className="font-semibold text-[#1a1a1a]">Billed distance:</span>
-                          <span className="inc">{" "}
-                          {billKm != null ? `${billKm} km` : "—"}</span>
-                        </p>
-                      )} */}
-                      <p className="text-[#444] leading-relaxed">
-                        <span className="font-semibold text-[#1a1a1a]">Extra fare/Km:</span >  
-                       <span className="inc"> {car.extra}</span>
-                      </p>
-                      <div className="pt-2 border-t border-[#e5e5e5] space-y-1 text-[#555]">
-                        <p>
-                          <span className="font-medium text-[#333]">Fuel:</span>
-                          <span className="inc">Included</span>
-                        </p>
-                        <p>
-                          <span className="font-medium text-[#333]">Driver:</span> 
-                           <span className="inc">Included</span>
-                        </p>
-                        <p>
-                          <span className="font-medium text-[#333]">Night:</span>
-                           <span className="inc">Included</span>
-                        </p>
+                    <div className="mt-auto w-full flex flex-col gap-4">
+                      <div className="w-full rounded-xl bg-[#f8f9fa] border border-[#d8d8d8] px-4 py-3 md:px-5 md:py-3.5 text-[13px] md:text-sm text-[#333]">
+                        <div className="flex min-h-[2.25rem] items-center justify-between gap-3">
+                          <span className="shrink-0 font-semibold text-[#1a1a1a]">Included Km:</span>
+                          <span className="min-w-0 text-right font-semibold tabular-nums text-green-600">
+                            {distanceKm != null ? `${distanceKm} km` : "—"}
+                          </span>
+                        </div>
+                        <div className="flex min-h-[2.25rem] items-center justify-between gap-3">
+                          <span className="shrink-0 font-semibold text-[#1a1a1a]">Extra fare/Km:</span>
+                          <span className="min-w-0 text-right font-semibold tabular-nums text-green-600">{car.extra}</span>
+                        </div>
+                        <div className="my-2.5 border-t border-[#e5e5e5]" />
+                        <div className="flex min-h-[2.25rem] items-center justify-between gap-3 text-[#555]">
+                          <span className="shrink-0 font-medium text-[#333]">Fuel:</span>
+                          <span className="text-right font-semibold text-green-600">Included</span>
+                        </div>
+                        <div className="flex min-h-[2.25rem] items-center justify-between gap-3 text-[#555]">
+                          <span className="shrink-0 font-medium text-[#333]">Driver:</span>
+                          <span className="text-right font-semibold text-green-600">Included</span>
+                        </div>
+                        <div className="flex min-h-[2.25rem] items-center justify-between gap-3 text-[#555]">
+                          <span className="shrink-0 font-medium text-[#333]">Night:</span>
+                          <span className="text-right font-semibold text-green-600">Included</span>
+                        </div>
                       </div>
-                    </div>
 
-                    <button
-                      type="button"
-                      className="mt-6 w-full py-3.5 px-6 bg-[#ffcc00] hover:bg-[#ffaa00] active:scale-[0.98] border-none rounded-full text-base font-bold text-black cursor-pointer transition-all duration-200 shadow-[0_4px_14px_rgba(255,170,0,0.35)]"
-                      onClick={() => handleBookNowClick(car)}
-                    >
-                      Book Now
-                    </button>
+                      <button
+                        type="button"
+                        className="w-full shrink-0 py-3.5 px-6 bg-[#ffcc00] hover:bg-[#ffaa00] active:scale-[0.98] border-none rounded-xl text-base font-bold text-black cursor-pointer transition-all duration-200 shadow-[0_4px_14px_rgba(255,170,0,0.35)]"
+                        onClick={() => handleBookNowClick(car)}
+                      >
+                        Book Now
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
