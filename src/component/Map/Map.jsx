@@ -3,9 +3,9 @@ import './Map.css';
 
 const BookingProcess = () => {
   const steps = [
-    { id: '01', title: 'Select City & Travel dates', img: 'https://www.mychoize.com/assets/img/Step_01.png', color: '#e8f5e9' },
-    { id: '02', title: 'Choose Car & Delivery Mode', img: 'https://www.mychoize.com/assets/img/Step_02.png', color: '#e3f2fd' },
-    { id: '03', title: 'Verify Yourself', img: 'https://www.mychoize.com/assets/img/Step_03.png', color: '#ffebee' },
+    { id: '01', title: 'Select City ', img: 'https://www.mychoize.com/assets/img/Step_01.png', color: '#e8f5e9' },
+    { id: '02', title: 'Select Travel date', img: 'https://www.mychoize.com/assets/img/Step_02.png', color: '#e3f2fd' },
+    { id: '03', title: 'Choose car ', img: 'https://www.mychoize.com/assets/img/Step_03.png', color: '#ffebee' },
     { id: '04', title: 'Make Payment', img: 'https://www.mychoize.com/assets/img/Step_04.png', color: '#fff8e1' },
   ];
 

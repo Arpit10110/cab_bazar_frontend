@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import Footer from "../Footer/Footer";
 import Navbar from "../Navbar/Navbar";
 import { useEffect } from "react";
+import "./Promo.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -353,12 +354,12 @@ function Promo() {
         <div></div>
       ) : (
         <div className="px-4 py-4 max-w-[1200px] mx-auto max-md:px-3" style={{ marginTop: "70px" }}>
-          <div className="bg-black text-white p-5 rounded-[10px]">
-            <div className="text-center font-bold mb-2.5">Trip Type : {data.tripType}</div>
-            <div className="flex justify-center gap-2.5 font-medium flex-wrap">
-              <span>{data.cities?.[0]}</span>
+          <div className="bg-black text-white p-1 rounded-[10px]">
+            <div className="text-center font-bold mb-2.5" >Trip Type : {data.tripType}</div>
+            <div className="flex justify-center gap-2.5 font-medium d-flex">
+              <span style={{width:"45%"}}>{data.cities?.[0]}</span>
               <span>➜</span>
-              <span>{data.cities?.[1]}</span>
+              <span style={{width:"45%"}}>{data.cities?.[1]}</span>
             </div>
             {distanceKm != null && (
               <div className="text-center text-sm mt-3 text-white/85">
@@ -447,8 +448,8 @@ function Promo() {
 
                     <div className="text-center mt-5 mb-4">
                       <div className="text-red-500 text-sm line-through decoration-2 opacity-90">₹ {car.oldPrice}</div>
-                      <h2 className="text-[1.85rem] md:text-[2rem] font-extrabold text-green-600 leading-tight mt-1 tracking-tight">
-                        ₹ {car.price}
+                      <h2 className="text-[1.85rem] md:text-[2rem] font-extrabold text-green-600 leading-tight mt-1 tracking-tight" >
+                       <span className="prs">₹ {car.price}</span> 
                       </h2>
                       <p className="text-[0.8rem] md:text-sm text-[#0077cc] font-bold uppercase tracking-wide mt-3 leading-snug px-1">
                         {car.type}
@@ -458,27 +459,32 @@ function Promo() {
 
                     <div className="rounded-xl bg-[#f8f9fa] border border-[#eee] px-4 py-4 text-left space-y-2.5 text-[13px] md:text-sm text-[#333]">
                       <p>
-                        <span className="font-semibold text-[#1a1a1a]">Route (one-way):</span>{" "}
-                        {distanceKm != null ? `${distanceKm} km` : "—"}
+                        <span className="font-semibold text-[#1a1a1a]">Included Km:</span>     <span className="inc">{" "}
+                        {distanceKm != null ? `${distanceKm} km` : "—"}</span>
                       </p>
-                      {data.tripMode === "round" && (
+                      {/* {data.tripMode === "round" && (
                         <p>
-                          <span className="font-semibold text-[#1a1a1a]">Billed distance:</span>{" "}
-                          {billKm != null ? `${billKm} km` : "—"}
+                          <span className="font-semibold text-[#1a1a1a]">Billed distance:</span>
+                          <span className="inc">{" "}
+                          {billKm != null ? `${billKm} km` : "—"}</span>
                         </p>
-                      )}
+                      )} */}
                       <p className="text-[#444] leading-relaxed">
-                        <span className="font-semibold text-[#1a1a1a]">Extra fare/Km:</span> {car.extra}
+                        <span className="font-semibold text-[#1a1a1a]">Extra fare/Km:</span >  
+                       <span className="inc"> {car.extra}</span>
                       </p>
                       <div className="pt-2 border-t border-[#e5e5e5] space-y-1 text-[#555]">
                         <p>
-                          <span className="font-medium text-[#333]">Fuel:</span> Included
+                          <span className="font-medium text-[#333]">Fuel:</span>
+                          <span className="inc">Included</span>
                         </p>
                         <p>
-                          <span className="font-medium text-[#333]">Driver:</span> Included
+                          <span className="font-medium text-[#333]">Driver:</span> 
+                           <span className="inc">Included</span>
                         </p>
                         <p>
-                          <span className="font-medium text-[#333]">Night:</span> Included
+                          <span className="font-medium text-[#333]">Night:</span>
+                           <span className="inc">Included</span>
                         </p>
                       </div>
                     </div>

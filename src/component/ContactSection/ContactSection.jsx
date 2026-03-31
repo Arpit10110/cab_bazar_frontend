@@ -29,8 +29,8 @@ const ContactSection = () => {
 
           <div className="contact-info">
             <h4>Call us at</h4>
-            <a href="tel:+918791671642" className="highlight">
-              +91 87916 71642
+            <a href="tel:+919045454224" className="highlight">
+              +91 9045454224
             </a>
 
             <h4>Email us at</h4>

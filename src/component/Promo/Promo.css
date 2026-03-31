@@ -1,0 +1,15 @@
+.inc{
+    display: flex;
+    justify-content: flex-end;
+    color: rgb(15, 172, 15);
+    font-size: 16px;
+    font-weight: 500;
+}
+.prs{
+    color:  rgb(15, 172, 15);
+    font-weight: 600;
+}
+
+.tracking-wide{
+    color: rgb(33, 227, 227);
+}
