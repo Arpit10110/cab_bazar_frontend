@@ -123,36 +123,53 @@ function Promo() {
 
   useEffect(() => {
     if (!data) return undefined;
+    const isLocalRental =
+      data.tripType === "local" && data.localSubType === "rental";
     let cancelled = false;
     const run = async () => {
       setCabsLoading(true);
       setCabFetchError(null);
       try {
-        const pv = data.tripMode === "round" ? priceView : "best";
-        const { data: res } = await axios.post(
-          `${import.meta.env.VITE_API}/api/v1/getcabdetails`,
-          {
-            cities: data.cities,
-            tripType: data.tripType,
-            tripMode: data.tripMode,
-            mobile: data.mobile,
-            placeIds: data.placeIds ?? [],
-            priceView: pv,
-          },
-        );
-        if (cancelled) return;
-        if (res?.cabs) {
-          setCabdata(res.cabs);
-          setDistanceKm(res.distanceKm ?? null);
-          setBillKm(res.billKm ?? null);
-        } else if (Array.isArray(res)) {
-          setCabdata(res);
+        if (isLocalRental) {
+          const { data: res } = await axios.post(
+            `${import.meta.env.VITE_API}/api/v1/get-local-rental-cabs`,
+            {
+              packageKey: data.localPackage,
+              city: data.cities?.[0] ?? "",
+              mobile: data.mobile,
+            },
+          );
+          if (cancelled) return;
+          setCabdata(Array.isArray(res?.cabs) ? res.cabs : []);
           setDistanceKm(null);
           setBillKm(null);
         } else {
-          setCabdata([]);
-          setDistanceKm(null);
-          setBillKm(null);
+          const pv = data.tripMode === "round" ? priceView : "best";
+          const { data: res } = await axios.post(
+            `${import.meta.env.VITE_API}/api/v1/getcabdetails`,
+            {
+              cities: data.cities,
+              tripType: data.tripType,
+              tripMode: data.tripMode,
+              mobile: data.mobile,
+              placeIds: data.placeIds ?? [],
+              priceView: pv,
+            },
+          );
+          if (cancelled) return;
+          if (res?.cabs) {
+            setCabdata(res.cabs);
+            setDistanceKm(res.distanceKm ?? null);
+            setBillKm(res.billKm ?? null);
+          } else if (Array.isArray(res)) {
+            setCabdata(res);
+            setDistanceKm(null);
+            setBillKm(null);
+          } else {
+            setCabdata([]);
+            setDistanceKm(null);
+            setBillKm(null);
+          }
         }
       } catch (error) {
         if (cancelled) return;
@@ -355,19 +372,34 @@ function Promo() {
       ) : (
         <div className="px-4 py-4 max-w-[1200px] mx-auto max-md:px-3" style={{ marginTop: "70px" }}>
           <div className="bg-black text-white p-1 rounded-[10px]">
-            <div className="text-center font-bold mb-2.5" >Trip Type : {data.tripType}</div>
-            <div className="flex justify-center gap-2.5 font-medium d-flex">
-              <span style={{width:"45%"}}>{data.cities?.[0]}</span>
-              <span>➜</span>
-              <span style={{width:"45%"}}>{data.cities?.[1]}</span>
+            <div className="text-center font-bold mb-2.5">
+              {data.tripType === "local" && data.localSubType === "rental"
+                ? "Local rental"
+                : `Trip Type : ${data.tripType}`}
             </div>
-            {distanceKm != null && (
-              <div className="text-center text-sm mt-3 text-white/85">
-                One-way route ~{distanceKm} km
-                {data.tripMode === "round" && billKm != null && (
-                  <span> · Billed {billKm} km (round trip)</span>
-                )}
+            {data.tripType === "local" && data.localSubType === "rental" ? (
+              <div className="text-center font-medium px-2 pb-1 space-y-1">
+                <div className="text-white/95 text-base">{data.cities?.[0]}</div>
+                <div className="text-sm text-white/80">
+                  {data.localPackageLabel ?? data.localPackage}
+                </div>
               </div>
+            ) : (
+              <>
+                <div className="flex justify-center gap-2.5 font-medium d-flex">
+                  <span style={{ width: "45%" }}>{data.cities?.[0]}</span>
+                  <span>➜</span>
+                  <span style={{ width: "45%" }}>{data.cities?.[1]}</span>
+                </div>
+                {distanceKm != null && (
+                  <div className="text-center text-sm mt-3 text-white/85">
+                    One-way route ~{distanceKm} km
+                    {data.tripMode === "round" && billKm != null && (
+                      <span> · Billed {billKm} km (round trip)</span>
+                    )}
+                  </div>
+                )}
+              </>
             )}
           </div>
 
@@ -378,7 +410,8 @@ function Promo() {
             <button className="bg-black text-white border-none py-2.5 px-5 rounded-[20px] cursor-pointer">Buy Now</button>
           </div>
 
-          {data.tripMode === "round" && (
+          {data.tripMode === "round" &&
+            !(data.tripType === "local" && data.localSubType === "rental") && (
             <>
               <div className="flex mb-5 flex-wrap max-md:flex-col max-md:w-[320px] max-md:mx-auto rounded-[10px] overflow-hidden border border-[#e5e5e5]">
                 <button
@@ -428,7 +461,10 @@ function Promo() {
               cabLoader
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-                {displayedCabs.map((car, index) => (
+                {displayedCabs.map((car, index) => {
+                  const isLocalRental =
+                    data.tripType === "local" && data.localSubType === "rental";
+                  return (
                   <div
                     className="bg-white rounded-2xl p-6 md:p-7 lg:p-8 border border-[#eaeaea] shadow-[0_8px_30px_rgba(0,0,0,0.06)] flex flex-col items-stretch transition-shadow duration-300 hover:shadow-[0_12px_40px_rgba(0,0,0,0.09)]"
                     key={index}
@@ -459,29 +495,67 @@ function Promo() {
 
                     <div className="mt-auto w-full flex flex-col gap-4">
                       <div className="w-full rounded-xl bg-[#f8f9fa] border border-[#d8d8d8] px-4 py-3 md:px-5 md:py-3.5 text-[13px] md:text-sm text-[#333]">
-                        <div className="flex min-h-[2.25rem] items-center justify-between gap-3">
-                          <span className="shrink-0 font-semibold text-[#1a1a1a]">Included Km:</span>
-                          <span className="min-w-0 text-right font-semibold tabular-nums text-green-600">
-                            {distanceKm != null ? `${distanceKm} km` : "—"}
-                          </span>
-                        </div>
-                        <div className="flex min-h-[2.25rem] items-center justify-between gap-3">
-                          <span className="shrink-0 font-semibold text-[#1a1a1a]">Extra fare/Km:</span>
-                          <span className="min-w-0 text-right font-semibold tabular-nums text-green-600">{car.extra}</span>
-                        </div>
-                        <div className="my-2.5 border-t border-[#e5e5e5]" />
-                        <div className="flex min-h-[2.25rem] items-center justify-between gap-3 text-[#555]">
-                          <span className="shrink-0 font-medium text-[#333]">Fuel:</span>
-                          <span className="text-right font-semibold text-green-600">Included</span>
-                        </div>
-                        <div className="flex min-h-[2.25rem] items-center justify-between gap-3 text-[#555]">
-                          <span className="shrink-0 font-medium text-[#333]">Driver:</span>
-                          <span className="text-right font-semibold text-green-600">Included</span>
-                        </div>
-                        <div className="flex min-h-[2.25rem] items-center justify-between gap-3 text-[#555]">
-                          <span className="shrink-0 font-medium text-[#333]">Night:</span>
-                          <span className="text-right font-semibold text-green-600">Included</span>
-                        </div>
+                        {isLocalRental ? (
+                          <>
+                            <div className="flex min-h-[2.25rem] items-center justify-between gap-3">
+                              <span className="shrink-0 font-semibold text-[#1a1a1a]">Included:</span>
+                              <span className="min-w-0 text-right font-semibold text-green-600">
+                                {car.includedLabel ?? "—"}
+                              </span>
+                            </div>
+                            <div className="flex min-h-[2.25rem] items-center justify-between gap-3">
+                              <span className="shrink-0 font-semibold text-[#1a1a1a]">Extra fare/Km:</span>
+                              <span className="min-w-0 text-right font-semibold tabular-nums text-green-600">
+                                {car.extra}
+                              </span>
+                            </div>
+                            <div className="flex min-h-[2.25rem] items-center justify-between gap-3">
+                              <span className="shrink-0 font-semibold text-[#1a1a1a]">Extra fare/Hour:</span>
+                              <span className="min-w-0 text-right font-semibold tabular-nums text-green-600">
+                                {car.extraHour ?? "—"}
+                              </span>
+                            </div>
+                            <div className="my-2.5 border-t border-[#e5e5e5]" />
+                            <div className="flex min-h-[2.25rem] items-center justify-between gap-3 text-[#555]">
+                              <span className="shrink-0 font-medium text-[#333]">Fuel Charges:</span>
+                              <span className="text-right font-semibold text-green-600">Included</span>
+                            </div>
+                            <div className="flex min-h-[2.25rem] items-center justify-between gap-3 text-[#555]">
+                              <span className="shrink-0 font-medium text-[#333]">Driver Charges:</span>
+                              <span className="text-right font-semibold text-green-600">Included</span>
+                            </div>
+                            <div className="flex min-h-[2.25rem] items-center justify-between gap-3 text-[#555]">
+                              <span className="shrink-0 font-medium text-[#333]">Night Charges:</span>
+                              <span className="text-right font-semibold text-green-600">Included</span>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="flex min-h-[2.25rem] items-center justify-between gap-3">
+                              <span className="shrink-0 font-semibold text-[#1a1a1a]">Included Km:</span>
+                              <span className="min-w-0 text-right font-semibold tabular-nums text-green-600">
+                                {distanceKm != null ? `${distanceKm} km` : "—"}
+                              </span>
+                            </div>
+                            <div className="flex min-h-[2.25rem] items-center justify-between gap-3">
+                              <span className="shrink-0 font-semibold text-[#1a1a1a]">Extra fare/Km:</span>
+                              <span className="min-w-0 text-right font-semibold tabular-nums text-green-600">{car.extra}</span>
+                            </div>
+                            <div className="my-2.5 border-t border-[#e5e5e5]" />
+                            <div className="flex min-h-[2.25rem] items-center justify-between gap-3 text-[#555]">
+                              <span className="shrink-0 font-medium text-[#333]">Fuel:</span>
+                              <span className="text-right font-semibold text-green-600">Included</span>
+                            </div>
+                            <div className="flex min-h-[2.25rem] items-center justify-between gap-3 text-[#555]">
+                              <span className="shrink-0 font-medium text-[#333]">Driver:</span>
+                              <span className="text-right font-semibold text-green-600">Included</span>
+                            </div>
+                            <div className="flex min-h-[2.25rem] items-center justify-between gap-3 text-[#555]">
+                              <span className="shrink-0 font-medium text-[#333]">Night:</span>
+                              <span className="text-right font-semibold text-green-600">Included</span>
+                            </div>
+                          </>
+                        )}
                       </div>
 
                       <button
@@ -493,7 +567,8 @@ function Promo() {
                       </button>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { Row, Col, Form, Button, Toast, ToastContainer } from "react-bootstrap";
 import { FaPhoneAlt, FaLocationArrow } from "react-icons/fa";
 import taxi from "/image/taxi.jpg";
@@ -7,6 +7,26 @@ import  './Header.css'
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useNavigate } from "react-router-dom";
+import { citydata } from "../../citydata/data.js";
+
+const LOCAL_RENTAL_PACKAGES = [
+  { key: "2h20km", label: "2 hours, 20 Km" },
+  { key: "4h40km", label: "4 hours, 40 Km" },
+  { key: "8h80km", label: "8 hours, 80 Km" },
+  { key: "12h120km", label: "12 hours, 120 Km" },
+];
+
+/** Local rental cities from bundled Cabbazar snapshot (sorted A→Z, active only) */
+const LOCAL_CITIES_CATALOG = [...citydata]
+  .filter((c) => c?.isActive !== false)
+  .sort((a, b) =>
+    String(a?.cityName ?? "").localeCompare(String(b?.cityName ?? ""), undefined, {
+      sensitivity: "base",
+    }),
+  );
+
+/** Max rows shown in local city dropdown (focus empty vs type-ahead) */
+const LOCAL_CITY_DROPDOWN_LIMIT = 15;
 
 const HeroWithPromo = () => {
   const navigate = useNavigate();
@@ -18,12 +38,35 @@ const HeroWithPromo = () => {
   const [suggestions, setSuggestions] = useState([]);
   const [activeIndex, setActiveIndex] = useState(null);
   const [loading, setLoading] = useState(false);
+  /** local / airport tab: rental vs airport (airport UI only for now) */
+  const [localSubType, setLocalSubType] = useState("rental");
+  const [localCity, setLocalCity] = useState("");
+  const [localPackage, setLocalPackage] = useState("");
+  const [airportDirection, setAirportDirection] = useState("");
   const [airport, setAirport] = useState("");
   const [toastShow, setToastShow] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
+  const [localCityMenuOpen, setLocalCityMenuOpen] = useState(false);
 
   // ✅ Debounce timer reference
   const debounceRef = useRef(null);
+
+  const localCityDropdownRows = useMemo(() => {
+    const q = String(localCity ?? "").trim().toLowerCase();
+    const pool = LOCAL_CITIES_CATALOG;
+    if (!q) {
+      return pool.slice(0, LOCAL_CITY_DROPDOWN_LIMIT);
+    }
+    return pool
+      .filter((c) => String(c?.cityName ?? "").toLowerCase().includes(q))
+      .slice(0, LOCAL_CITY_DROPDOWN_LIMIT);
+  }, [localCity]);
+
+  useEffect(() => {
+    if (tripType !== "local" || localSubType !== "rental") {
+      setLocalCityMenuOpen(false);
+    }
+  }, [tripType, localSubType]);
 
   // ✅ API CALL
   const fetchSuggestions = async (value) => {
@@ -85,6 +128,7 @@ const HeroWithPromo = () => {
   useEffect(() => {
     const handleClickOutside = () => {
       setSuggestions([]);
+      setLocalCityMenuOpen(false);
     };
 
     document.addEventListener("click", handleClickOutside);
@@ -123,18 +167,46 @@ const HeroWithPromo = () => {
           return;
         }
       }
-    } else if (!String(airport ?? "").trim()) {
-      showFormToast("Please select an airport.");
+      const bookingdata = {
+        tripType,
+        tripMode,
+        cities,
+        placeIds,
+        mobile: mobileDigits.slice(-10),
+      };
+      localStorage.setItem("bookingdata", JSON.stringify(bookingdata));
+      navigate("/cablist");
       return;
     }
 
+    // Local / Airport tab
+    if (localSubType === "airport") {
+      showFormToast(
+        "Airport transfer booking is coming soon. Please use Local Rental to check prices and book.",
+      );
+      return;
+    }
+
+    // Local rental
+    if (!String(localCity ?? "").trim()) {
+      showFormToast("Please enter your city.");
+      return;
+    }
+    if (!localPackage) {
+      showFormToast("Please select a package.");
+      return;
+    }
+
+    const pkg = LOCAL_RENTAL_PACKAGES.find((p) => p.key === localPackage);
     const bookingdata = {
-      tripType,
-      tripMode,
-      cities,
-      placeIds,
+      tripType: "local",
+      localSubType: "rental",
+      localPackage,
+      localPackageLabel: pkg?.label ?? localPackage,
+      tripMode: "local_rental",
+      cities: [String(localCity).trim(), ""],
+      placeIds: [],
       mobile: mobileDigits.slice(-10),
-      airport: tripType === "local" ? airport : undefined,
     };
     localStorage.setItem("bookingdata", JSON.stringify(bookingdata));
     navigate("/cablist");
@@ -188,6 +260,50 @@ const HeroWithPromo = () => {
                   </Button>
                 </div>
 
+                {tripType === "local" && (
+                  <div
+                    className="flex justify-between bg-[#e9e9e9] px-[15px] rounded-[15px] mb-[1px] cursor-pointer"
+                    style={{ padding: "9px" }}
+                  >
+                    <span
+                      onClick={() => setLocalSubType("rental")}
+                      className="flex items-center"
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") setLocalSubType("rental");
+                      }}
+                    >
+                      <span
+                        className={
+                          localSubType === "rental"
+                            ? "h-[15px] w-[15px] bg-[#f5b400] rounded-full inline-block mr-1.5 ring-2 ring-black ring-inset"
+                            : "h-[15px] w-[15px] border-2 border-[#f5b400] bg-transparent rounded-full inline-block mr-1.5"
+                        }
+                      />
+                      Local Rental
+                    </span>
+                    <span
+                      onClick={() => setLocalSubType("airport")}
+                      className="flex items-center"
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") setLocalSubType("airport");
+                      }}
+                    >
+                      <span
+                        className={
+                          localSubType === "airport"
+                            ? "h-[15px] w-[15px] bg-[#f5b400] rounded-full inline-block mr-1.5 ring-2 ring-black ring-inset"
+                            : "h-[15px] w-[15px] border-2 border-[#f5b400] bg-transparent rounded-full inline-block mr-1.5"
+                        }
+                      />
+                      Airport Transfer
+                    </span>
+                  </div>
+                )}
+
                 {tripType === "outstation" && (
                   <div className="flex justify-between bg-[#e9e9e9]  px-[15px] rounded-[15px] mb-[1px] cursor-pointer" style={{padding:"9px"}}>
                     <span onClick={() => setTripMode("round")} className="flex items-center">
@@ -215,102 +331,188 @@ const HeroWithPromo = () => {
                 )}
 
                 <Form onClick={(e) => e.stopPropagation()}>
-                  {cities.map((city, index) => (
-                    <Form.Group
-                      key={index}
-                      className="p-1 relative"
-                    >
-                      <Form.Control
-                        type="text"
-                        placeholder={
-                          index === 0
-                            ? "Enter pickup city"
-                            : "Enter destination city"
-                        }
-                        value={city}
-                        onChange={(e) =>
-                          handleCityChange(e.target.value, index)
-                        }
-                        autoComplete="off"
-                        className="!rounded-xl !py-3 !pr-10 !pl-[15px] !border-none !bg-[#e8e8e8c9]"
-                      />
+                  {tripType === "outstation" &&
+                    cities.map((city, index) => (
+                      <Form.Group key={index} className="p-1 relative">
+                        <Form.Control
+                          type="text"
+                          placeholder={
+                            index === 0
+                              ? "Enter pickup city"
+                              : "Enter destination city"
+                          }
+                          value={city}
+                          onChange={(e) =>
+                            handleCityChange(e.target.value, index)
+                          }
+                          autoComplete="off"
+                          className="!rounded-xl !py-3 !pr-10 !pl-[15px] !border-none !bg-[#e8e8e8c9]"
+                        />
 
-                      <FaLocationArrow className="absolute right-[15px] top-[12px] text-gray-500" />
+                        <FaLocationArrow className="absolute right-[15px] top-[12px] text-gray-500" />
 
-                      {activeIndex === index &&
-                        (suggestions.length > 0 || loading) && (
-                          <div className="bg-white absolute w-full top-[45px] rounded-lg shadow-[0_5px_15px_rgba(0,0,0,0.1)] z-[99]">
-                            {loading && (
-                              <div className="px-3 py-2 cursor-pointer">
-                                Loading...
-                              </div>
-                            )}
-
-                            {!loading &&
-                              suggestions.map((item) => (
-                                <div
-                                  key={item.place_id}
-                                  className="px-3 py-2 cursor-pointer hover:bg-[#f5b400]"
-                                  onClick={() => {
-                                    const updated = [...cities];
-                                    updated[index] = item.description;
-                                    setCities(updated);
-                                    const nextIds = [...placeIds];
-                                    nextIds[index] = item.place_id;
-                                    setPlaceIds(nextIds);
-                                    setSuggestions([]);
-                                  }}
-                                >
-                                  <strong>
-                                    {
-                                      item.structured_formatting
-                                        ?.main_text
-                                    }
-                                  </strong>
-                                  <small className="text-muted d-block">
-                                    {
-                                      item.structured_formatting
-                                        ?.secondary_text
-                                    }
-                                  </small>
+                        {activeIndex === index &&
+                          (suggestions.length > 0 || loading) && (
+                            <div className="bg-white absolute w-full top-[45px] rounded-lg shadow-[0_5px_15px_rgba(0,0,0,0.1)] z-[99]">
+                              {loading && (
+                                <div className="px-3 py-2 cursor-pointer">
+                                  Loading...
                                 </div>
-                              ))}
-                          </div>
-                        )}
-                    </Form.Group>
-                  ))}
+                              )}
+
+                              {!loading &&
+                                suggestions.map((item) => (
+                                  <div
+                                    key={item.place_id}
+                                    className="px-3 py-2 cursor-pointer hover:bg-[#f5b400]"
+                                    onClick={() => {
+                                      const updated = [...cities];
+                                      updated[index] = item.description;
+                                      setCities(updated);
+                                      const nextIds = [...placeIds];
+                                      nextIds[index] = item.place_id;
+                                      setPlaceIds(nextIds);
+                                      setSuggestions([]);
+                                    }}
+                                  >
+                                    <strong>
+                                      {
+                                        item.structured_formatting
+                                          ?.main_text
+                                      }
+                                    </strong>
+                                    <small className="text-muted d-block">
+                                      {
+                                        item.structured_formatting
+                                          ?.secondary_text
+                                      }
+                                    </small>
+                                  </div>
+                                ))}
+                            </div>
+                          )}
+                      </Form.Group>
+                    ))}
 
                   {tripType === "outstation" && (
-                    <div className="bg-[#e9d9b6] p-2.5 rounded-xl mb-[8px] mt-[3px] text-center cursor-pointer" onClick={addCity}>
+                    <div
+                      className="bg-[#e9d9b6] p-2.5 rounded-xl mb-[8px] mt-[3px] text-center cursor-pointer"
+                      onClick={addCity}
+                    >
                       + Add More City
                     </div>
                   )}
 
-                  {tripType === "local" && (
-                    <Form.Group className="mb-1">
-                      <Form.Select
-                        value={airport}
-                        onChange={(e) => setAirport(e.target.value)}
-                        className="!rounded-xl !py-3 !pr-10 !pl-[15px] !border-none !bg-[#e8e8e8c9]"
+                  {tripType === "local" && localSubType === "rental" && (
+                    <>
+                      <Form.Group
+                        className="p-1 relative mb-1"
+                        onClick={(e) => e.stopPropagation()}
                       >
-                        <option value="">Select Airport</option>
-                        <option value="Delhi Airport">Delhi Airport</option>
-                        <option value="Mumbai Airport">Mumbai Airport</option>
-                        <option value="Bangalore Airport">Bangalore Airport</option>
-                      </Form.Select>
-                    </Form.Group>
+                        <Form.Control
+                          type="text"
+                          placeholder="Select City"
+                          value={localCity}
+                          onChange={(e) => {
+                            setLocalCity(e.target.value);
+                            setLocalCityMenuOpen(true);
+                          }}
+                          onFocus={() => setLocalCityMenuOpen(true)}
+                          autoComplete="off"
+                          className="!rounded-xl !py-3 !pr-10 !pl-[15px] !border-none !bg-[#e8e8e8c9]"
+                        />
+                        <FaLocationArrow className="absolute right-[15px] top-[12px] text-gray-500 pointer-events-none" />
+                        {localCityMenuOpen && (
+                          <div className="bg-white absolute w-full top-[45px] rounded-lg shadow-[0_5px_15px_rgba(0,0,0,0.1)] z-[99] max-h-[min(320px,55vh)] overflow-y-auto border border-[#eee]">
+                            {localCityDropdownRows.length === 0 && (
+                              <div className="px-3 py-2.5 text-sm text-muted">
+                                No matching city
+                              </div>
+                            )}
+                            {localCityDropdownRows.map((row) => (
+                                <div
+                                  key={row._id ?? row.cityName}
+                                  className="px-3 py-2 cursor-pointer hover:bg-[#f5b400] border-b border-[#f0f0f0] last:border-b-0"
+                                  onMouseDown={(e) => e.preventDefault()}
+                                  onClick={() => {
+                                    setLocalCity(String(row.cityName ?? ""));
+                                    setLocalCityMenuOpen(false);
+                                  }}
+                                >
+                                  <strong className="text-[#1a1a1a]">
+                                    {row.cityName}
+                                  </strong>
+                                  {row.state ? (
+                                    <small className="text-muted d-block">
+                                      {row.state}
+                                    </small>
+                                  ) : null}
+                                </div>
+                            ))}
+                          </div>
+                        )}
+                      </Form.Group>
+                      <Form.Group className="mb-1 relative">
+                        <Form.Select
+                          value={localPackage}
+                          onChange={(e) => setLocalPackage(e.target.value)}
+                          className="!rounded-xl !py-3 !pr-10 !pl-[15px] !border-none !bg-[#e8e8e8c9] appearance-auto"
+                        >
+                          <option value="">Select package</option>
+                          {LOCAL_RENTAL_PACKAGES.map((p) => (
+                            <option key={p.key} value={p.key}>
+                              {p.label}
+                            </option>
+                          ))}
+                        </Form.Select>
+                        <FaLocationArrow className="absolute right-[15px] top-[12px] text-gray-500 pointer-events-none opacity-60" />
+                      </Form.Group>
+                    </>
+                  )}
+
+                  {tripType === "local" && localSubType === "airport" && (
+                    <>
+                      <Form.Group className="mb-1">
+                        <Form.Select
+                          value={airportDirection}
+                          onChange={(e) => setAirportDirection(e.target.value)}
+                          className="!rounded-xl !py-3 !pr-10 !pl-[15px] !border-none !bg-[#e8e8e8c9]"
+                        >
+                          <option value="">From Airport / To Airport</option>
+                          <option value="from">From Airport</option>
+                          <option value="to">To Airport</option>
+                        </Form.Select>
+                      </Form.Group>
+                      <Form.Group className="mb-1">
+                        <Form.Select
+                          value={airport}
+                          onChange={(e) => setAirport(e.target.value)}
+                          className="!rounded-xl !py-3 !pr-10 !pl-[15px] !border-none !bg-[#e8e8e8c9]"
+                        >
+                          <option value="">Select Airport</option>
+                          <option value="Delhi Airport">Delhi Airport</option>
+                          <option value="Mumbai Airport">Mumbai Airport</option>
+                          <option value="Bangalore Airport">Bangalore Airport</option>
+                        </Form.Select>
+                      </Form.Group>
+                    </>
                   )}
 
                   <Form.Group className="mb-3 relative">
-                    <Form.Control
-                      type="text"
-                      placeholder="Enter mobile number"
-                      value={mobile}
-                      onChange={(e)=>setMobile(e.target.value)}
-                      required
-                      className="!rounded-xl !py-3 !pr-10 !pl-[15px] !border-none !bg-[#e8e8e8c9]"
-                    />
-                    <FaPhoneAlt className="absolute right-[15px] top-[12px] text-gray-500" />
+                    <div className="relative flex items-stretch rounded-xl overflow-hidden !bg-[#e8e8e8c9] border-none">
+                      <span className="flex items-center pl-[15px] pr-2 text-gray-600 text-sm shrink-0 select-none">
+                        +91
+                      </span>
+                      <Form.Control
+                        type="text"
+                        placeholder="Enter mobile number"
+                        value={mobile}
+                        onChange={(e) => setMobile(e.target.value)}
+                        required
+                        className="!rounded-none !rounded-r-xl !py-3 !pr-10 !pl-0 !border-none !bg-transparent shadow-none focus:shadow-none"
+                      />
+                      <FaPhoneAlt className="absolute right-[15px] top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
+                    </div>
                   </Form.Group>
 
                   <Button
@@ -318,7 +520,7 @@ const HeroWithPromo = () => {
                     onClick={handleCabData}
                     className="w-full m-btn !bg-[#f5b400] !border-none p-2.5 !m-0 font-bold !rounded-[30px] flex justify-center items-center text-black"
                   >
-                    Book Cab
+                    Check Price &amp; Book Cab
                   </Button>
                 </Form>
               </div>
