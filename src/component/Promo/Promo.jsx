@@ -5,6 +5,10 @@ import { useEffect } from "react";
 import "./Promo.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import {
+  AIRPORT_VEHICLE_IMAGES,
+  AIRPORT_VEHICLE_LABELS,
+} from "../../airport/airport_city.js";
 
 const faqData = [
   {
@@ -85,6 +89,30 @@ function FAQ() {
   );
 }
 
+/** Build cab cards for /cablist from bundled airport slab (no API). */
+function buildAirportTransferCabCards(airportCityFare) {
+  if (!airportCityFare?.price) return [];
+  return AIRPORT_VEHICLE_LABELS.map((label) => {
+    const price = Number(airportCityFare.price[label]);
+    const oldPrice = Math.round(Number.isFinite(price) ? price * 1.09 : 0);
+    const extraPer = airportCityFare.extraFarePerKm?.[label] ?? 16;
+    return {
+      img: AIRPORT_VEHICLE_IMAGES[label],
+      img1: AIRPORT_VEHICLE_IMAGES[label],
+      oldPrice,
+      price: Number.isFinite(price) ? price : 0,
+      type: "Airport transfer (AC)",
+      name: label,
+      extra: `₹ ${extraPer}/Km`,
+      _airportIncludedKm: airportCityFare.includedKm,
+      _airportToll: airportCityFare.tollStateTax,
+      _airportFuel: airportCityFare.fuelCharges,
+      _airportDriver: airportCityFare.driverCharges,
+      _airportNight: airportCityFare.nightCharges,
+    };
+  });
+}
+
 // ✅ MAIN COMPONENT (Promo Page)
 function Promo() {
   const navigate = useNavigate();
@@ -125,11 +153,31 @@ function Promo() {
     if (!data) return undefined;
     const isLocalRental =
       data.tripType === "local" && data.localSubType === "rental";
+    const isAirportTransfer =
+      data.tripType === "local" && data.localSubType === "airport";
     let cancelled = false;
     const run = async () => {
       setCabsLoading(true);
       setCabFetchError(null);
       try {
+        if (isAirportTransfer) {
+          const fare = data.airportCityFare;
+          if (!fare?.price) {
+            if (!cancelled) {
+              setCabFetchError(
+                "Missing airport fare data. Please start again from the home page.",
+              );
+              setCabdata([]);
+              setDistanceKm(null);
+              setBillKm(null);
+            }
+          } else if (!cancelled) {
+            setCabdata(buildAirportTransferCabCards(fare));
+            setDistanceKm(fare.includedKm ?? null);
+            setBillKm(null);
+          }
+          return;
+        }
         if (isLocalRental) {
           const { data: res } = await axios.post(
             `${import.meta.env.VITE_API}/api/v1/get-local-rental-cabs`,
@@ -375,13 +423,27 @@ function Promo() {
             <div className="text-center font-bold mb-2.5">
               {data.tripType === "local" && data.localSubType === "rental"
                 ? "Local rental"
-                : `Trip Type : ${data.tripType}`}
+                : data.tripType === "local" && data.localSubType === "airport"
+                  ? "Airport transfer"
+                  : `Trip Type : ${data.tripType}`}
             </div>
             {data.tripType === "local" && data.localSubType === "rental" ? (
               <div className="text-center font-medium px-2 pb-1 space-y-1">
                 <div className="text-white/95 text-base">{data.cities?.[0]}</div>
                 <div className="text-sm text-white/80">
                   {data.localPackageLabel ?? data.localPackage}
+                </div>
+              </div>
+            ) : data.tripType === "local" && data.localSubType === "airport" ? (
+              <div className="text-center font-medium px-2 pb-1 space-y-1.5">
+                <div className="text-sm text-white/85">
+                  {data.airportDirection === "to" ? "To airport" : "From airport"}
+                </div>
+                <div className="text-white/95 text-[0.95rem] leading-snug px-1">
+                  {data.airportName}
+                </div>
+                <div className="text-white/90 text-base">
+                  ↔ {data.destinationCity}
                 </div>
               </div>
             ) : (
@@ -411,7 +473,8 @@ function Promo() {
           </div>
 
           {data.tripMode === "round" &&
-            !(data.tripType === "local" && data.localSubType === "rental") && (
+            !(data.tripType === "local" && data.localSubType === "rental") &&
+            !(data.tripType === "local" && data.localSubType === "airport") && (
             <>
               <div className="flex mb-5 flex-wrap max-md:flex-col max-md:w-[320px] max-md:mx-auto rounded-[10px] overflow-hidden border border-[#e5e5e5]">
                 <button
@@ -464,6 +527,8 @@ function Promo() {
                 {displayedCabs.map((car, index) => {
                   const isLocalRental =
                     data.tripType === "local" && data.localSubType === "rental";
+                  const isAirportTransfer =
+                    data.tripType === "local" && data.localSubType === "airport";
                   return (
                   <div
                     className="bg-white rounded-2xl p-6 md:p-7 lg:p-8 border border-[#eaeaea] shadow-[0_8px_30px_rgba(0,0,0,0.06)] flex flex-col items-stretch transition-shadow duration-300 hover:shadow-[0_12px_40px_rgba(0,0,0,0.09)]"
@@ -495,7 +560,49 @@ function Promo() {
 
                     <div className="mt-auto w-full flex flex-col gap-4">
                       <div className="w-full rounded-xl bg-[#f8f9fa] border border-[#d8d8d8] px-4 py-3 md:px-5 md:py-3.5 text-[13px] md:text-sm text-[#333]">
-                        {isLocalRental ? (
+                        {isAirportTransfer ? (
+                          <>
+                            <div className="flex min-h-[2.25rem] items-center justify-between gap-3">
+                              <span className="shrink-0 font-semibold text-[#1a1a1a]">Included Km:</span>
+                              <span className="min-w-0 text-right font-semibold tabular-nums text-green-600">
+                                {car._airportIncludedKm != null
+                                  ? `${car._airportIncludedKm} km`
+                                  : "—"}
+                              </span>
+                            </div>
+                            <div className="flex min-h-[2.25rem] items-center justify-between gap-3">
+                              <span className="shrink-0 font-semibold text-[#1a1a1a]">Extra fare/Km:</span>
+                              <span className="min-w-0 text-right font-semibold tabular-nums text-green-600">
+                                {car.extra}
+                              </span>
+                            </div>
+                            <div className="my-2.5 border-t border-[#e5e5e5]" />
+                            <div className="flex min-h-[2.25rem] items-center justify-between gap-3 text-[#555]">
+                              <span className="shrink-0 font-medium text-[#333]">Toll, State Tax:</span>
+                              <span className="text-right font-semibold text-green-600 capitalize">
+                                {car._airportToll ?? "included"}
+                              </span>
+                            </div>
+                            <div className="flex min-h-[2.25rem] items-center justify-between gap-3 text-[#555]">
+                              <span className="shrink-0 font-medium text-[#333]">Fuel Charges:</span>
+                              <span className="text-right font-semibold text-green-600 capitalize">
+                                {car._airportFuel ?? "included"}
+                              </span>
+                            </div>
+                            <div className="flex min-h-[2.25rem] items-center justify-between gap-3 text-[#555]">
+                              <span className="shrink-0 font-medium text-[#333]">Driver Charges:</span>
+                              <span className="text-right font-semibold text-green-600 capitalize">
+                                {car._airportDriver ?? "included"}
+                              </span>
+                            </div>
+                            <div className="flex min-h-[2.25rem] items-center justify-between gap-3 text-[#555]">
+                              <span className="shrink-0 font-medium text-[#333]">Night Charges:</span>
+                              <span className="text-right font-semibold text-green-600 capitalize">
+                                {car._airportNight ?? "included"}
+                              </span>
+                            </div>
+                          </>
+                        ) : isLocalRental ? (
                           <>
                             <div className="flex min-h-[2.25rem] items-center justify-between gap-3">
                               <span className="shrink-0 font-semibold text-[#1a1a1a]">Included:</span>

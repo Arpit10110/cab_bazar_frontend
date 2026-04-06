@@ -8,6 +8,11 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useNavigate } from "react-router-dom";
 import { citydata } from "../../citydata/data.js";
+import airportListData from "../../airport/airport_list.js";
+import {
+  resolveAirportDestinationOptions,
+  getDefaultAirportDestinationCityName,
+} from "../../airport/airport_city.js";
 
 const LOCAL_RENTAL_PACKAGES = [
   { key: "2h20km", label: "2 hours, 20 Km" },
@@ -28,6 +33,9 @@ const LOCAL_CITIES_CATALOG = [...citydata]
 /** Max rows shown in local city dropdown (focus empty vs type-ahead) */
 const LOCAL_CITY_DROPDOWN_LIMIT = 15;
 
+/** Airport search: cap when input empty (catalog is ~90; scroll inside panel) */
+const AIRPORT_DROPDOWN_LIMIT = 120;
+
 const HeroWithPromo = () => {
   const navigate = useNavigate();
   const [tripType, setTripType] = useState("outstation");
@@ -43,13 +51,74 @@ const HeroWithPromo = () => {
   const [localCity, setLocalCity] = useState("");
   const [localPackage, setLocalPackage] = useState("");
   const [airportDirection, setAirportDirection] = useState("");
+  /** Selected airport `_id` from `airport_list.js` */
   const [airport, setAirport] = useState("");
+  const [airportDestinationCity, setAirportDestinationCity] = useState("");
+  const [airportQuery, setAirportQuery] = useState("");
+  const [airportMenuOpen, setAirportMenuOpen] = useState(false);
   const [toastShow, setToastShow] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [localCityMenuOpen, setLocalCityMenuOpen] = useState(false);
 
   // ✅ Debounce timer reference
   const debounceRef = useRef(null);
+
+  const airportCatalog = useMemo(
+    () =>
+      [...airportListData]
+        .filter((a) => a?.isActive !== false)
+        .sort((a, b) =>
+          String(a?.airportName ?? "").localeCompare(
+            String(b?.airportName ?? ""),
+            undefined,
+            { sensitivity: "base" },
+          ),
+        ),
+    [],
+  );
+
+  const selectedAirportRecord = useMemo(
+    () => airportCatalog.find((a) => a._id === airport) ?? null,
+    [airport, airportCatalog],
+  );
+
+  const airportCityOptions = useMemo(() => {
+    if (!selectedAirportRecord) return [];
+    return resolveAirportDestinationOptions(selectedAirportRecord);
+  }, [selectedAirportRecord]);
+
+  const selectedAirportCityRow = useMemo(
+    () =>
+      airportCityOptions.find((c) => c.cityName === airportDestinationCity) ??
+      null,
+    [airportCityOptions, airportDestinationCity],
+  );
+
+  useEffect(() => {
+    if (!selectedAirportRecord) {
+      setAirportDestinationCity("");
+      return;
+    }
+    const opts = resolveAirportDestinationOptions(selectedAirportRecord);
+    setAirportDestinationCity(getDefaultAirportDestinationCityName(opts));
+  }, [selectedAirportRecord]);
+
+  useEffect(() => {
+    if (tripType !== "local" || localSubType !== "airport") {
+      setAirportMenuOpen(false);
+    }
+  }, [tripType, localSubType]);
+
+  const airportDropdownRows = useMemo(() => {
+    const q = String(airportQuery ?? "").trim().toLowerCase();
+    const pool = airportCatalog;
+    if (!q) {
+      return pool.slice(0, AIRPORT_DROPDOWN_LIMIT);
+    }
+    return pool.filter((a) =>
+      String(a?.airportName ?? "").toLowerCase().includes(q),
+    );
+  }, [airportQuery, airportCatalog]);
 
   const localCityDropdownRows = useMemo(() => {
     const q = String(localCity ?? "").trim().toLowerCase();
@@ -129,6 +198,7 @@ const HeroWithPromo = () => {
     const handleClickOutside = () => {
       setSuggestions([]);
       setLocalCityMenuOpen(false);
+      setAirportMenuOpen(false);
     };
 
     document.addEventListener("click", handleClickOutside);
@@ -179,11 +249,53 @@ const HeroWithPromo = () => {
       return;
     }
 
-    // Local / Airport tab
     if (localSubType === "airport") {
-      showFormToast(
-        "Airport transfer booking is coming soon. Please use Local Rental to check prices and book.",
-      );
+      if (!String(airportDirection ?? "").trim()) {
+        showFormToast("Please choose From Airport or To Airport.");
+        return;
+      }
+      if (!String(airport ?? "").trim()) {
+        showFormToast("Please select an airport.");
+        return;
+      }
+      if (!String(airportDestinationCity ?? "").trim()) {
+        showFormToast("Please select a city.");
+        return;
+      }
+      if (!selectedAirportCityRow || !selectedAirportRecord) {
+        showFormToast("Could not load fare for this city. Try again.");
+        return;
+      }
+      const airportCityFare = {
+        cityName: selectedAirportCityRow.cityName,
+        km: selectedAirportCityRow.km,
+        includedKm: selectedAirportCityRow.includedKm,
+        price: { ...selectedAirportCityRow.price },
+        extraFarePerKm: { ...selectedAirportCityRow.extraFarePerKm },
+        tollStateTax: selectedAirportCityRow.tollStateTax,
+        fuelCharges: selectedAirportCityRow.fuelCharges,
+        driverCharges: selectedAirportCityRow.driverCharges,
+        nightCharges: selectedAirportCityRow.nightCharges,
+      };
+      const bookingdata = {
+        tripType: "local",
+        localSubType: "airport",
+        tripMode: "airport_transfer",
+        airportDirection,
+        airportId: airport,
+        airportName: selectedAirportRecord.airportName,
+        airportState: selectedAirportRecord.state ?? "",
+        destinationCity: airportDestinationCity,
+        airportCityFare,
+        cities: [
+          selectedAirportRecord.airportName,
+          airportDestinationCity,
+        ],
+        placeIds: [],
+        mobile: mobileDigits.slice(-10),
+      };
+      localStorage.setItem("bookingdata", JSON.stringify(bookingdata));
+      navigate("/cablist");
       return;
     }
 
@@ -475,7 +587,9 @@ const HeroWithPromo = () => {
                       <Form.Group className="mb-1">
                         <Form.Select
                           value={airportDirection}
-                          onChange={(e) => setAirportDirection(e.target.value)}
+                          onChange={(e) => {
+                            setAirportDirection(e.target.value);
+                          }}
                           className="!rounded-xl !py-3 !pr-10 !pl-[15px] !border-none !bg-[#e8e8e8c9]"
                         >
                           <option value="">From Airport / To Airport</option>
@@ -483,16 +597,78 @@ const HeroWithPromo = () => {
                           <option value="to">To Airport</option>
                         </Form.Select>
                       </Form.Group>
+                      <Form.Group
+                        className="p-1 relative mb-1"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Form.Control
+                          type="text"
+                          placeholder="Select Airport"
+                          value={airportQuery}
+                          onChange={(e) => {
+                            const v = e.target.value;
+                            setAirportQuery(v);
+                            setAirportMenuOpen(true);
+                            const picked = selectedAirportRecord;
+                            if (
+                              picked &&
+                              v.trim() !==
+                                String(picked.airportName ?? "").trim()
+                            ) {
+                              setAirport("");
+                            }
+                          }}
+                          onFocus={() => setAirportMenuOpen(true)}
+                          autoComplete="off"
+                          className="!rounded-xl !py-3 !pr-10 !pl-[15px] !border-none !bg-[#e8e8e8c9]"
+                        />
+                        <FaLocationArrow className="absolute right-[15px] top-[12px] text-gray-500 pointer-events-none" />
+                        {airportMenuOpen && (
+                          <div className="bg-white absolute w-full top-[45px] rounded-lg shadow-[0_5px_15px_rgba(0,0,0,0.1)] z-[99] max-h-[min(320px,55vh)] overflow-y-auto border border-[#eee]">
+                            {airportDropdownRows.length === 0 && (
+                              <div className="px-3 py-2.5 text-sm text-muted">
+                                No matching airport
+                              </div>
+                            )}
+                            {airportDropdownRows.map((a) => (
+                              <div
+                                key={a._id}
+                                className="px-3 py-2 cursor-pointer hover:bg-[#f5b400] border-b border-[#f0f0f0] last:border-b-0"
+                                onMouseDown={(e) => e.preventDefault()}
+                                onClick={() => {
+                                  setAirport(a._id);
+                                  setAirportQuery(String(a.airportName ?? ""));
+                                  setAirportMenuOpen(false);
+                                }}
+                              >
+                                <strong className="text-[#1a1a1a] text-sm font-normal leading-snug block">
+                                  {a.airportName}
+                                </strong>
+                                {a.state ? (
+                                  <small className="text-muted d-block">
+                                    {a.state}
+                                  </small>
+                                ) : null}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </Form.Group>
                       <Form.Group className="mb-1">
                         <Form.Select
-                          value={airport}
-                          onChange={(e) => setAirport(e.target.value)}
+                          value={airportDestinationCity}
+                          onChange={(e) => {
+                            setAirportDestinationCity(e.target.value);
+                          }}
+                          disabled={!airport}
                           className="!rounded-xl !py-3 !pr-10 !pl-[15px] !border-none !bg-[#e8e8e8c9]"
                         >
-                          <option value="">Select Airport</option>
-                          <option value="Delhi Airport">Delhi Airport</option>
-                          <option value="Mumbai Airport">Mumbai Airport</option>
-                          <option value="Bangalore Airport">Bangalore Airport</option>
+                          <option value="">Select city</option>
+                          {airportCityOptions.map((c) => (
+                            <option key={`${c.cityName}-${c.km}`} value={c.cityName}>
+                              {c.cityName}
+                            </option>
+                          ))}
                         </Form.Select>
                       </Form.Group>
                     </>
